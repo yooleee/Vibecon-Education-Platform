@@ -1,15 +1,10 @@
 import os
-from openai import AsyncOpenAI
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 from dotenv import load_dotenv
 from typing import List
 import uuid
 
 load_dotenv()
-
-# Initialize OpenAI client with Emergent LLM key
-client = AsyncOpenAI(
-    api_key=os.getenv("EMERGENT_LLM_KEY")
-)
 
 
 async def answer_query(question: str, relevant_chunks: List[str]) -> str:
@@ -27,11 +22,19 @@ async def answer_query(question: str, relevant_chunks: List[str]) -> str:
         # Prepare context from relevant chunks
         context = "\n\n".join(relevant_chunks)
         
-        # Create prompt
-        system_prompt = """You are an expert AI tutor helping students understand lecture content.
+        # Create system message
+        system_message = """You are an expert AI tutor helping students understand lecture content.
 Use the provided lecture transcript excerpts to answer the student's question accurately and helpfully.
 If the answer is not in the provided context, say so and provide general guidance."""
         
+        # Initialize LlmChat
+        chat = LlmChat(
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            session_id=str(uuid.uuid4()),
+            system_message=system_message
+        ).with_model("openai", "gpt-4o")
+        
+        # Create user message with context
         user_prompt = f"""Lecture Context:
 {context}
 
@@ -39,19 +42,12 @@ Student Question: {question}
 
 Provide a clear, concise answer based on the lecture content."""
         
-        # Call GPT-4o
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.7,
-            max_tokens=500
-        )
+        user_message = UserMessage(text=user_prompt)
         
-        answer = response.choices[0].message.content
-        return answer
+        # Get response
+        response = await chat.send_message(user_message)
+        
+        return response
     
     except Exception as e:
         raise Exception(f"Query answering failed: {str(e)}")
@@ -69,8 +65,14 @@ async def text_to_speech(text: str) -> str:
         URL or path to audio file
     """
     try:
+        from openai import AsyncOpenAI
+        
         # For now, use OpenAI TTS as placeholder
         # Will integrate Cartesia Sonic 3 later
+        client = AsyncOpenAI(
+            api_key=os.getenv("EMERGENT_LLM_KEY")
+        )
+        
         response = await client.audio.speech.create(
             model="tts-1",
             voice="alloy",
@@ -81,9 +83,13 @@ async def text_to_speech(text: str) -> str:
         audio_id = str(uuid.uuid4())
         audio_path = f"/app/data/uploads/tts_{audio_id}.mp3"
         
+        # Write the audio content
+        audio_content = b""
+        async for chunk in response.iter_bytes():
+            audio_content += chunk
+        
         with open(audio_path, "wb") as f:
-            async for chunk in response.iter_bytes():
-                f.write(chunk)
+            f.write(audio_content)
         
         return f"/api/audio/{audio_id}"
     
