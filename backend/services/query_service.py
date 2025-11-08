@@ -8,8 +8,7 @@ load_dotenv()
 
 # Initialize OpenAI client with Emergent LLM key
 client = AsyncOpenAI(
-    api_key=os.getenv("EMERGENT_LLM_KEY"),
-    base_url="https://api.emergentagi.com/v1"
+    api_key=os.getenv("EMERGENT_LLM_KEY")
 )
 
 
