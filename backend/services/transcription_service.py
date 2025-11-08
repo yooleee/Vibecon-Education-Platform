@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize OpenAI client with Emergent LLM key
+# Initialize OpenAI client with Emergent LLM key for Whisper transcription
 client = AsyncOpenAI(
     api_key=os.getenv("EMERGENT_LLM_KEY")
 )
@@ -28,7 +28,13 @@ async def transcribe_audio(audio_path: str) -> str:
                 response_format="text"
             )
         
-        return transcript
+        # Handle different response formats
+        if isinstance(transcript, str):
+            return transcript
+        elif hasattr(transcript, 'text'):
+            return transcript.text
+        else:
+            return str(transcript)
     
     except Exception as e:
         raise Exception(f"Transcription failed: {str(e)}")
