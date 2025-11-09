@@ -350,10 +350,10 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
                   {recording ? <Stop sx={{ fontSize: 48 }} /> : <Mic sx={{ fontSize: 48 }} />}
                 </Fab>
                 <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold' }}>
-                  {recording ? '🔴 Recording... Release to send' : 'Press & Hold to Speak'}
+                  {recording ? '🔴 Recording... Keep speaking, release when done' : 'Press & Hold to Speak'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {recording ? 'Ask your question clearly' : 'Voice responses will play automatically'}
+                  {recording ? 'Speak clearly into your microphone' : 'Hold button while speaking (min 1 second)'}
                 </Typography>
               </Box>
             )}
