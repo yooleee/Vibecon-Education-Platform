@@ -47,12 +47,12 @@ async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
 
 async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64-b679-ae501e7d6091", language: str = "en") -> str:
     """
-    Convert text to speech using Cartesia Sonic 3 for ultra-low latency
+    Convert text to speech using Cartesia Sonic 3 (multilingual model) for ultra-low latency
     
     Args:
         text: Text to convert to speech
         voice_id: Cartesia voice ID (default is Barbershop Man, or use cloned voice ID)
-        language: Language code (en, es, hi, etc.)
+        language: Language code (en, es, hi) for multilingual support
     
     Returns:
         Path to generated audio file
