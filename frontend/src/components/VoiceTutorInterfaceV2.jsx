@@ -1,41 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  IconButton,
-  CircularProgress,
-  Alert,
-  Paper,
-  Fab,
-  Chip,
-  LinearProgress,
-  ToggleButtonGroup,
-  ToggleButton,
-  Switch,
-  FormControlLabel,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-} from '@mui/material';
-import {
-  Mic,
-  Stop,
-  VolumeUp,
-  SmartToy,
-  Person,
-  Pause,
-  PlayArrow,
-  Language,
-  Memory,
-  History,
-} from '@mui/icons-material';
 import axios from 'axios';
-import QuizTriggerButton from './quiz/QuizTriggerButton';
-import QuizConfigModal from './quiz/QuizConfigModal';
-import QuizInterface from './quiz/QuizInterface';
+import './VoiceTutorInterfaceV2.css';
 
 function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
   const [useV2, setUseV2] = useState(true); // Default to V2 (conversation memory)
