@@ -140,7 +140,7 @@ function AppContent() {
           >
             <h2 className="text-center mb-lg">Upload New Lecture</h2>
             <p className="text-center text-secondary mb-2xl" style={{ fontSize: '1.125rem' }}>
-              Drop an MP4 video file to create an AI-powered tutor
+              {isAuthenticated ? 'Drop an MP4 video file to create an AI-powered tutor' : 'Sign in to upload your own lectures'}
             </p>
             <UploadSection 
               backendUrl={BACKEND_URL}
@@ -149,6 +149,7 @@ function AppContent() {
               setUploading={setUploading}
               uploadProgress={uploadProgress}
               setUploadProgress={setUploadProgress}
+              isAuthenticated={isAuthenticated}
             />
           </motion.div>
         </div>
