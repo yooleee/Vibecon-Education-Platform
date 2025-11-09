@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import './App.css';
+import './styles/quiz.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
