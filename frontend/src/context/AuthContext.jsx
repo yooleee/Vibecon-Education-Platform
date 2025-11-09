@@ -115,6 +115,7 @@ export function AuthProvider({ children, backendUrl }) {
   const value = {
     user,
     loading,
+    token,
     isAuthenticated: !!user,
     loginWithGoogle,
     logout: handleLogout
