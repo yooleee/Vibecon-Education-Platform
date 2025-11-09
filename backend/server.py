@@ -256,6 +256,21 @@ async def get_lecture(lecture_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.delete("/api/lectures/{lecture_id}")
+async def delete_lecture_endpoint(lecture_id: str):
+    """Delete a lecture and all associated files"""
+    try:
+        success = delete_lecture(lecture_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        return {"message": "Lecture deleted successfully", "lecture_id": lecture_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/query")
 async def query_lecture(request: QueryRequest):
     """Ask a question about a lecture - Voice-first interaction with cloned professor voice"""
