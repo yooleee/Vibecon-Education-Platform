@@ -195,8 +195,30 @@ Return ONLY the JSON, no additional text."""
         user_answer_clean = user_answer.strip().lower()
         correct_answer_clean = question.correct_answer.strip().lower()
         
-        # Check exact match or substring match
-        return user_answer_clean == correct_answer_clean or user_answer_clean in correct_answer_clean
+        # Check exact match
+        if user_answer_clean == correct_answer_clean:
+            return True
+        
+        # Check substring match
+        if user_answer_clean in correct_answer_clean or correct_answer_clean in user_answer_clean:
+            return True
+        
+        # For MCQ, check if user said option letter (A, B, C, D)
+        if question.question_type == QuestionType.MULTIPLE_CHOICE and question.options:
+            for i, option in enumerate(question.options):
+                option_letter = chr(65 + i).lower()  # A, B, C, D
+                # Check if user said "option A", "A", "the answer is A", etc.
+                if option_letter in user_answer_clean:
+                    return option.is_correct
+        
+        # For True/False, check for variations
+        if question.question_type == QuestionType.TRUE_FALSE:
+            if correct_answer_clean in ['true', 'yes', 'correct']:
+                return any(word in user_answer_clean for word in ['true', 'yes', 'correct', 'right'])
+            elif correct_answer_clean in ['false', 'no', 'incorrect']:
+                return any(word in user_answer_clean for word in ['false', 'no', 'incorrect', 'wrong'])
+        
+        return False
     
     def _generate_mcq_feedback(self, question: QuizQuestion, user_answer: str, is_correct: bool, provide_hint: bool) -> str:
         """Generate feedback for MCQ/True-False answers"""
