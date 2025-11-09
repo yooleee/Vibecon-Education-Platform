@@ -74,6 +74,56 @@ async def health_check():
     return {"status": "healthy", "service": "EduVoice API"}
 
 
+@app.post("/api/auth/google")
+async def google_auth(request: GoogleAuthRequest):
+    """Authenticate with Google OAuth"""
+    try:
+        # Verify Google token
+        user_info = verify_google_token(request.token)
+        
+        if not user_info:
+            raise HTTPException(status_code=401, detail="Invalid Google token")
+        
+        # Create or update user
+        user = create_or_update_user(
+            google_id=user_info['google_id'],
+            email=user_info['email'],
+            name=user_info['name'],
+            picture=user_info['picture']
+        )
+        
+        # Generate JWT token
+        access_token = create_access_token({"google_id": user['google_id']})
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "google_id": user['google_id'],
+                "email": user['email'],
+                "name": user['name'],
+                "picture": user['picture']
+            }
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Auth error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Authentication failed")
+
+
+@app.get("/api/auth/me")
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    return {
+        "google_id": current_user['google_id'],
+        "email": current_user['email'],
+        "name": current_user['name'],
+        "picture": current_user['picture']
+    }
+
+
 @app.get("/api/upload-progress/{lecture_id}")
 async def get_upload_progress(lecture_id: str):
     """Get real-time progress for an upload"""
