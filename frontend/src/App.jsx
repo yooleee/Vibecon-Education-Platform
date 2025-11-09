@@ -147,7 +147,7 @@ function App() {
                 lectureId={selectedLecture.id}
                 backendUrl={BACKEND_URL}
               />
-              <ChatInterface
+              <VoiceTutorInterface
                 lectureId={selectedLecture.id}
                 backendUrl={BACKEND_URL}
               />
