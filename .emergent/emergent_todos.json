@@ -13,10 +13,10 @@
   },
   {
     "content": "Verify frontend compiles without errors",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Take screenshots to verify UI changes are applied correctly",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
