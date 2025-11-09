@@ -1,11 +1,11 @@
 [
   {
     "content": "Install LangGraph dependencies (langgraph, langchain, langchain-openai) and restart backend",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create MongoDB session and conversation models with UUID + UTC",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Implement minimal StateGraph with MessagesState in /backend/graph/graph.py",
