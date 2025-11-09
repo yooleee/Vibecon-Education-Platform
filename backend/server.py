@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
 from pydantic import BaseModel
@@ -7,6 +7,7 @@ import json
 from typing import List, Optional
 import uuid
 from datetime import datetime
+import asyncio
 
 from services.audio_service import extract_audio_from_video
 from services.transcription_service import transcribe_audio
@@ -39,6 +40,9 @@ LECTURE_DIR = "/app/data/lectures"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(LECTURE_DIR, exist_ok=True)
+
+# Progress tracking storage
+upload_progress = {}
 
 
 class QueryRequest(BaseModel):
