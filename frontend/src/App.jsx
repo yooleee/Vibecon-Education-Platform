@@ -340,18 +340,33 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
     e.stopPropagation();
     setDragActive(false);
 
+    if (!isAuthenticated) {
+      setError('Please sign in to upload lectures');
+      return;
+    }
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleUpload(e.dataTransfer.files[0]);
     }
   };
 
   const handleChange = (e) => {
+    if (!isAuthenticated) {
+      setError('Please sign in to upload lectures');
+      return;
+    }
+
     if (e.target.files && e.target.files[0]) {
       handleUpload(e.target.files[0]);
     }
   };
 
   const handleUpload = async (file) => {
+    if (!isAuthenticated) {
+      setError('Please sign in to upload lectures');
+      return;
+    }
+
     if (!file.name.endsWith('.mp4') && !file.name.endsWith('.MP4')) {
       setError('Only MP4 files are supported');
       return;
