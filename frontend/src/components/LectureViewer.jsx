@@ -7,14 +7,19 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  Button,
+  Paper,
 } from '@mui/material';
-import { MenuBook } from '@mui/icons-material';
+import { MenuBook, Summarize, VolumeUp } from '@mui/icons-material';
 import axios from 'axios';
 
 function LectureViewer({ lectureId, backendUrl }) {
   const [lecture, setLecture] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
 
   useEffect(() => {
     loadLecture();
@@ -31,6 +36,21 @@ function LectureViewer({ lectureId, backendUrl }) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    try {
+      setSummaryLoading(true);
+      setSummaryError(null);
+      
+      const response = await axios.post(`${backendUrl}/api/lectures/${lectureId}/summary`);
+      setSummary(response.data);
+    } catch (err) {
+      setSummaryError('Failed to generate summary. Please try again.');
+      console.error('Summary error:', err);
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
@@ -63,8 +83,78 @@ function LectureViewer({ lectureId, backendUrl }) {
 
           <Divider sx={{ my: 2 }} />
 
+          {/* Summary Section */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h6">
+                Lecture Summary
+              </Typography>
+              {!summary && (
+                <Button
+                  variant="contained"
+                  startIcon={<Summarize />}
+                  onClick={handleGenerateSummary}
+                  disabled={summaryLoading}
+                  data-testid="generate-summary-button"
+                >
+                  {summaryLoading ? 'Generating...' : 'Generate Summary'}
+                </Button>
+              )}
+            </Box>
+
+            {summaryLoading && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <CircularProgress size={24} />
+                <Typography variant="body2" color="text.secondary">
+                  Generating summary with AI...
+                </Typography>
+              </Box>
+            )}
+
+            {summaryError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {summaryError}
+              </Alert>
+            )}
+
+            {summary && (
+              <Paper elevation={2} sx={{ p: 3, bgcolor: 'grey.50' }}>
+                <Typography variant="body1" paragraph sx={{ lineHeight: 1.8 }}>
+                  {summary.summary}
+                </Typography>
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Typography variant="caption" color="text.secondary">
+                    {summary.word_count} words • {summary.cached ? 'Cached' : 'Freshly generated'}
+                  </Typography>
+                  
+                  <audio 
+                    controls 
+                    src={`${backendUrl}${summary.audio_url}`}
+                    style={{ maxWidth: '100%' }}
+                    data-testid="summary-audio-player"
+                  >
+                    <source src={`${backendUrl}${summary.audio_url}`} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </Box>
+                
+                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <VolumeUp fontSize="small" color="primary" />
+                  <Typography variant="caption" color="primary">
+                    Listen to the summary in the professor's voice
+                  </Typography>
+                </Box>
+              </Paper>
+            )}
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
           <Typography variant="h6" gutterBottom>
-            Transcript
+            Full Transcript
           </Typography>
 
           <Box className="transcript-viewer" data-testid="transcript-viewer">
