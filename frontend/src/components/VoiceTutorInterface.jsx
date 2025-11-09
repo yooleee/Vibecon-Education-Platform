@@ -246,7 +246,7 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
           </Box>
 
           <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 3 }}>
-            🎤 Press and hold the microphone to ask questions about the lecture
+            🎤 <strong>Press and HOLD</strong> the microphone button while speaking, then release to send
           </Typography>
 
           {error && (
