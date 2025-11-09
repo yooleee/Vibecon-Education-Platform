@@ -15,37 +15,52 @@ openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class SentenceBuffer:
-    """Buffer tokens and yield complete sentences"""
+    """Buffer tokens and yield phrases/sentences for faster TTS"""
     
     def __init__(self):
         self.buffer = ""
+        self.word_count = 0
+        self.phrase_threshold = 5  # Generate audio every 5 words for speed
     
     def add(self, text: str) -> List[str]:
-        """Add text to buffer and return complete sentences"""
+        """Add text to buffer and return complete phrases/sentences"""
         self.buffer += text
-        sentences = []
+        chunks = []
         
-        # Look for sentence endings: . ! ? followed by space or end of string
-        while True:
-            # Find the next sentence ending
-            match = re.search(r'([.!?])\s+', self.buffer)
-            if match:
-                # Extract the complete sentence
-                end_pos = match.end()
-                sentence = self.buffer[:end_pos].strip()
-                if sentence:
-                    sentences.append(sentence)
-                self.buffer = self.buffer[end_pos:]
-            else:
-                # No complete sentence found
-                break
+        # Count words in buffer
+        words = self.buffer.split()
+        self.word_count = len(words)
         
-        return sentences
+        # Strategy 1: Look for sentence endings (priority)
+        match = re.search(r'([.!?])\s+', self.buffer)
+        if match:
+            # Extract the complete sentence
+            end_pos = match.end()
+            chunk = self.buffer[:end_pos].strip()
+            if chunk:
+                chunks.append(chunk)
+            self.buffer = self.buffer[end_pos:]
+            self.word_count = len(self.buffer.split())
+        
+        # Strategy 2: If we have enough words, yield a phrase (faster audio!)
+        elif self.word_count >= self.phrase_threshold:
+            # Find natural pause points (commas, conjunctions)
+            pause_match = re.search(r'(,\s+|;\s+|\s+and\s+|\s+but\s+|\s+or\s+)', self.buffer)
+            if pause_match:
+                end_pos = pause_match.end()
+                chunk = self.buffer[:end_pos].strip()
+                if chunk and len(chunk.split()) >= 3:  # At least 3 words
+                    chunks.append(chunk)
+                    self.buffer = self.buffer[end_pos:]
+                    self.word_count = len(self.buffer.split())
+        
+        return chunks
     
     def flush(self) -> str:
         """Return remaining buffer content"""
         remaining = self.buffer.strip()
         self.buffer = ""
+        self.word_count = 0
         return remaining
 
 
