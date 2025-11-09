@@ -296,7 +296,6 @@ If the answer is not in the provided context, say so and provide general guidanc
                 initial_state["messages"].append(AIMessage(content=full_response))
                 initial_state["response_text"] = full_response
                 
-                from graph.nodes import persist_node
                 await persist_node(initial_state)
                 
                 # Send complete
