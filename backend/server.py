@@ -26,6 +26,8 @@ from middleware.auth import get_current_user, get_current_user_optional
 
 # Import V2 router (LangGraph-based)
 from routers.graph_routes import router as graph_router
+# Import quiz router
+from routers.quiz_routes import router as quiz_router
 
 # Check for ffmpeg on startup and attempt auto-install
 def check_and_install_ffmpeg():
