@@ -13,11 +13,11 @@
   },
   {
     "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Install livekit-client in frontend (yarn add livekit-client)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add Start Session button to LectureList component",
