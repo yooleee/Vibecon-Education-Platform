@@ -263,6 +263,7 @@ async def upload_lecture(file: UploadFile = File(...), current_user: dict = Depe
         })
         lecture_data = {
             "id": lecture_id,
+            "user_id": current_user['google_id'],  # Link to user
             "filename": file.filename,
             "upload_date": datetime.now().isoformat(),
             "transcript": transcript,
