@@ -88,20 +88,24 @@ async def upload_lecture(file: UploadFile = File(...)):
         voice_clip_path, clip_quality = extract_best_voice_clip(
             audio_path, 
             clip_duration=8.0,  # 8 seconds is optimal
-            num_candidates=10
+            num_candidates=5  # Reduced from 10 to 5 for faster processing
         )
         
-        # STEP 2: Clone the voice using Cartesia
-        print(f"\n🔬 Cloning professor's voice...")
+        # STEP 2 & 3: Run voice cloning and transcription IN PARALLEL for speed
+        print(f"\n⚡ Starting parallel processing (voice cloning + transcription)...")
+        import asyncio
         from services.voice_service import clone_voice_from_audio
-        cloned_voice_id = await clone_voice_from_audio(
-            voice_clip_path,
-            voice_name=f"Professor {lecture_id[:8]}"
+        
+        # Run both tasks concurrently
+        cloned_voice_id, transcript = await asyncio.gather(
+            clone_voice_from_audio(
+                voice_clip_path,
+                voice_name=f"Professor {lecture_id[:8]}"
+            ),
+            transcribe_audio(audio_path)
         )
         
-        # Transcribe audio
-        print(f"\n📝 Transcribing lecture...")
-        transcript = await transcribe_audio(audio_path)
+        print(f"✅ Parallel processing complete!")
         
         # Chunk transcript
         chunks = chunk_text(transcript)
