@@ -13,10 +13,10 @@
   },
   {
     "content": "Test multilingual feature with all languages",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test LiveKit feature end-to-end",
-    "status": "pending"
+    "status": "completed"
   }
 ]
