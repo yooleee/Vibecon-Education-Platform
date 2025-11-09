@@ -1,14 +1,18 @@
 [
   {
-    "content": "Remove full transcript viewer from lecture viewer",
-    "status": "completed"
+    "content": "Research Cartesia emotion and SSML features",
+    "status": "in_progress"
   },
   {
-    "content": "Document LiveKit agent requirements",
-    "status": "completed"
+    "content": "Update AI prompts to be more friendly and include emotion tags",
+    "status": "pending"
   },
   {
-    "content": "Verify frontend build and multilingual feature",
-    "status": "completed"
+    "content": "Clean conversation history display (remove emotion tags and symbols)",
+    "status": "pending"
+  },
+  {
+    "content": "Test the enhanced voice with emotions",
+    "status": "pending"
   }
 ]
