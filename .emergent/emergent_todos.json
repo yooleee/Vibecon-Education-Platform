@@ -5,10 +5,10 @@
   },
   {
     "content": "Test multilingual voice responses with Hindi and Spanish selections",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Verify English still works correctly with sonic-3 model",
-    "status": "pending"
+    "status": "completed"
   }
 ]
