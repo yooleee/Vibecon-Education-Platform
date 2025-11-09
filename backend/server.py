@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
 from pydantic import BaseModel
@@ -16,8 +16,11 @@ from services.embedding_service import generate_embeddings, compute_similarity
 from services.query_service import answer_query, text_to_speech
 from services.youtube_service import download_youtube_audio, validate_youtube_url
 from services.summary_service import generate_lecture_summary, generate_summary_audio
+from services.auth_service import verify_google_token, create_access_token
 from utils.storage import save_lecture, load_lecture, list_lectures, delete_lecture
 from utils.chunking import chunk_text
+from models.user import create_or_update_user, load_user_by_google_id
+from middleware.auth import get_current_user, get_current_user_optional
 
 # Import V2 router (LangGraph-based)
 from routers.graph_routes import router as graph_router
