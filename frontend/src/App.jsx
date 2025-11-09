@@ -726,4 +726,66 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
   );
 }
 
+// Lecture Card Component
+function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="glass-card"
+      data-testid={`lecture-card-${lecture.id}`}
+    >
+      <div className="flex justify-between items-start mb-md">
+        <div style={{ flex: 1 }}>
+          <h4 className="mb-sm">{lecture.filename}</h4>
+          <p className="text-secondary text-sm">
+            Uploaded: {new Date(lecture.upload_date).toLocaleDateString()}
+          </p>
+          <p className="text-tertiary text-sm mt-sm">
+            {lecture.chunks_count} chunks
+          </p>
+          {lecture.is_demo && (
+            <span className="badge badge-demo mt-sm">Demo</span>
+          )}
+        </div>
+        {canDelete && (
+          <button
+            className="glass-button-danger"
+            style={{ padding: '8px', borderRadius: 'var(--radius-sm)' }}
+            onClick={() => onDelete(lecture.id)}
+            data-testid={`delete-lecture-${lecture.id}`}
+            title="Delete lecture"
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
+      </div>
+      <button
+        className="glass-button-primary glass-button"
+        style={{ width: '100%', justifyContent: 'center' }}
+        onClick={() => onSelect(lecture)}
+        data-testid={`open-lecture-${lecture.id}`}
+      >
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        Open AI Tutor
+      </button>
+    </motion.div>
+  );
+}
+
+// Main App component with AuthProvider wrapper
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
 export default App;
