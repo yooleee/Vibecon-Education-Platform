@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { LiveKitRoom, useVoiceAssistant, BarVisualizer, RoomAudioRenderer } from '@livekit/components-react';
-import '@livekit/components-styles';
 import axios from 'axios';
 import './LiveKitVoiceChat.css';
 
