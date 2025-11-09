@@ -19,27 +19,26 @@ class SentenceBuffer:
     
     def __init__(self):
         self.buffer = ""
-        self.sentence_endings = re.compile(r'[.!?]\s')
     
     def add(self, text: str) -> List[str]:
         """Add text to buffer and return complete sentences"""
         self.buffer += text
         sentences = []
         
-        # Find all sentence boundaries
-        matches = list(self.sentence_endings.finditer(self.buffer))
-        
-        if matches:
-            # Extract complete sentences
-            last_end = 0
-            for match in matches:
-                sentence = self.buffer[last_end:match.end()].strip()
+        # Look for sentence endings: . ! ? followed by space or end of string
+        while True:
+            # Find the next sentence ending
+            match = re.search(r'([.!?])\s+', self.buffer)
+            if match:
+                # Extract the complete sentence
+                end_pos = match.end()
+                sentence = self.buffer[:end_pos].strip()
                 if sentence:
                     sentences.append(sentence)
-                last_end = match.end()
-            
-            # Keep incomplete part in buffer
-            self.buffer = self.buffer[last_end:]
+                self.buffer = self.buffer[end_pos:]
+            else:
+                # No complete sentence found
+                break
         
         return sentences
     
@@ -62,13 +61,15 @@ async def stream_voice_response(
         dict with 'type' (text/audio/complete) and 'data'
     """
     try:
+        print(f"\n🎙️ Starting streaming response with voice: {cloned_voice_id}")
+        
         # Prepare context
         context = "\n\n".join(relevant_chunks)
         
         system_message = """You are an expert AI tutor helping students understand lecture content.
 Use the provided lecture transcript excerpts to answer the student's question accurately and helpfully.
 If the answer is not in the provided context, say so and provide general guidance.
-Keep your answers concise and focused."""
+Keep your answers clear and conversational."""
         
         user_prompt = f"""Lecture Context:
 {context}
@@ -87,6 +88,8 @@ Provide a clear, concise answer based on the lecture content."""
             "data": {"message": "AI is thinking..."}
         }
         
+        print("📡 Creating GPT-4o stream...")
+        
         # Create streaming completion
         stream = await openai_client.chat.completions.create(
             model="gpt-4o",
@@ -99,57 +102,65 @@ Provide a clear, concise answer based on the lecture content."""
             stream=True
         )
         
+        print("✅ Stream created, processing tokens...")
+        
         async for chunk in stream:
-            if chunk.choices[0].delta.content:
-                token = chunk.choices[0].delta.content
-                full_response += token
-                
-                # Add to buffer and get complete sentences
-                sentences = sentence_buffer.add(token)
-                
-                # Process each complete sentence
-                for sentence in sentences:
-                    if sentence:
-                        print(f"📝 Complete sentence: {sentence[:50]}...")
-                        
-                        # Send text immediately
-                        yield {
-                            "type": "text",
-                            "data": {"text": sentence}
-                        }
-                        
-                        # Generate and send audio
-                        try:
-                            print(f"🎙️ Generating TTS for sentence...")
-                            audio_path = await text_to_speech_cartesia(sentence, voice_id=cloned_voice_id)
-                            print(f"✅ TTS generated: {audio_path}")
+            if chunk.choices and len(chunk.choices) > 0:
+                delta = chunk.choices[0].delta
+                if delta.content:
+                    token = delta.content
+                    full_response += token
+                    
+                    # Add to buffer and get complete sentences
+                    sentences = sentence_buffer.add(token)
+                    
+                    # Process each complete sentence
+                    for sentence in sentences:
+                        if sentence and len(sentence.strip()) > 3:
+                            print(f"📝 Complete sentence: '{sentence[:60]}...'")
                             
-                            # Read audio file and encode as base64
-                            with open(audio_path, "rb") as f:
-                                audio_data = base64.b64encode(f.read()).decode('utf-8')
-                            
-                            print(f"📤 Sending audio chunk ({len(audio_data)} bytes base64)")
+                            # Send text immediately
                             yield {
-                                "type": "audio",
-                                "data": {
-                                    "audio": audio_data,
-                                    "text": sentence
+                                "type": "text",
+                                "data": {"text": sentence}
+                            }
+                            
+                            # Generate and send audio in background
+                            try:
+                                print(f"🎙️ Generating TTS...")
+                                audio_path = await text_to_speech_cartesia(sentence, voice_id=cloned_voice_id)
+                                print(f"✅ TTS generated: {os.path.basename(audio_path)}")
+                                
+                                # Read audio file and encode as base64
+                                with open(audio_path, "rb") as f:
+                                    audio_bytes = f.read()
+                                    audio_data = base64.b64encode(audio_bytes).decode('utf-8')
+                                
+                                print(f"📤 Sending audio ({len(audio_data)} chars)")
+                                yield {
+                                    "type": "audio",
+                                    "data": {
+                                        "audio": audio_data,
+                                        "text": sentence
+                                    }
                                 }
-                            }
-                            
-                            # Clean up audio file
-                            os.remove(audio_path)
-                            
-                        except Exception as e:
-                            print(f"❌ TTS error: {e}")
-                            yield {
-                                "type": "error",
-                                "data": {"message": f"TTS failed: {str(e)}"}
-                            }
+                                
+                                # Clean up audio file
+                                os.remove(audio_path)
+                                print("🗑️ Audio file cleaned up")
+                                
+                            except Exception as e:
+                                print(f"❌ TTS error: {e}")
+                                import traceback
+                                traceback.print_exc()
+        
+        print("🏁 Stream complete, flushing buffer...")
         
         # Flush any remaining content
         remaining = sentence_buffer.flush()
-        if remaining:
+        if remaining and len(remaining.strip()) > 3:
+            print(f"📝 Remaining text: '{remaining[:60]}...'")
+            
             yield {
                 "type": "text",
                 "data": {"text": remaining}
@@ -157,7 +168,10 @@ Provide a clear, concise answer based on the lecture content."""
             
             # Generate audio for remaining text
             try:
+                print(f"🎙️ Generating final TTS...")
                 audio_path = await text_to_speech_cartesia(remaining, voice_id=cloned_voice_id)
+                print(f"✅ Final TTS generated")
+                
                 with open(audio_path, "rb") as f:
                     audio_data = base64.b64encode(f.read()).decode('utf-8')
                 
@@ -170,9 +184,10 @@ Provide a clear, concise answer based on the lecture content."""
                 }
                 os.remove(audio_path)
             except Exception as e:
-                print(f"TTS error for remaining: {e}")
+                print(f"❌ Final TTS error: {e}")
         
         # Send completion event
+        print(f"✅ Response complete! Total length: {len(full_response)}")
         yield {
             "type": "complete",
             "data": {
@@ -182,6 +197,9 @@ Provide a clear, concise answer based on the lecture content."""
         }
         
     except Exception as e:
+        print(f"❌ Streaming error: {e}")
+        import traceback
+        traceback.print_exc()
         yield {
             "type": "error",
             "data": {"message": str(e)}
