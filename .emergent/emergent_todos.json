@@ -1,15 +1,15 @@
 [
   {
     "content": "Install emergentintegrations library for LLM chat integration",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Retrieve Emergent LLM key using emergent_integrations_manager tool",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Create quiz service with LLM integration (quiz_service.py) for question generation and evaluation",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create QuizSession and QuizResult MongoDB models (models/quiz.py)",
