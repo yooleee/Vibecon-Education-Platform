@@ -371,6 +371,51 @@ function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
     setAudioProgress(0);
   };
 
+  // Quiz handlers
+  const handleStartQuiz = async (config) => {
+    try {
+      setProcessing(true);
+      setShowQuizConfig(false);
+      
+      const response = await axios.post(`${backendUrl}/api/quiz/session/start`, config);
+      
+      setQuizSession(response.data);
+      setQuizActive(true);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to start quiz:', err);
+      setError('Failed to start quiz. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleCloseQuiz = () => {
+    setQuizActive(false);
+    setQuizSession(null);
+  };
+
+  const handleQuizComplete = () => {
+    setQuizActive(false);
+    setQuizSession(null);
+    // Optionally, reload lecture or show success message
+  };
+
+  // If quiz is active, show quiz interface instead of chat
+  if (quizActive && quizSession) {
+    return (
+      <Box sx={{ mt: 4 }}>
+        <QuizInterface
+          sessionId={quizSession.session_id}
+          lectureId={lectureId}
+          voiceMode={quizSession.voice_mode}
+          onClose={handleCloseQuiz}
+          onComplete={handleQuizComplete}
+        />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ mt: 4 }}>
       <Card elevation={3} sx={{ bgcolor: '#f8f9fa' }}>
