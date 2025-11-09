@@ -21,7 +21,7 @@ from livekit.agents import (
     AutoSubscribe,
 )
 from livekit.plugins import openai, deepgram, cartesia
-from livekit.plugins import silero
+from livekit.plugins.silero import VAD as silero_vad
 
 # Local imports
 from utils.storage import load_lecture
