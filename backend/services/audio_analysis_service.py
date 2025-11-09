@@ -91,7 +91,7 @@ def calculate_quality_score(metrics: Dict[str, float]) -> float:
 
 
 def extract_best_voice_clip(audio_path: str, clip_duration: float = 8.0, 
-                           num_candidates: int = 10) -> Tuple[str, Dict]:
+                           num_candidates: int = 5) -> Tuple[str, Dict]:
     """
     Extract the best quality voice clip from an audio file
     
