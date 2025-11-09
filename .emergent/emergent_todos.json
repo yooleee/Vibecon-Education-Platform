@@ -1,15 +1,11 @@
 [
   {
-    "content": "Merge partner's server.py changes (YouTube/delete endpoints) with our V2 routes",
+    "content": "Merge partner's storage.py changes (delete functionality) with current version",
     "status": "completed"
   },
   {
-    "content": "Merge partner's storage.py changes (delete functionality) with current version",
-    "status": "in_progress"
-  },
-  {
     "content": "Merge partner's transcription_service.py updates",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Merge partner's LectureList.jsx (delete button) with current version",
@@ -28,8 +24,8 @@
     "status": "pending"
   },
   {
-    "content": "Update requirements.txt to include both partner's and our dependencies",
-    "status": "pending"
+    "content": "Update requirements.txt to include yt-dlp dependency",
+    "status": "in_progress"
   },
   {
     "content": "Test merged application end-to-end",
