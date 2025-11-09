@@ -266,6 +266,7 @@ If the answer is not in the provided context, say so and provide general guidanc
                                 
                                 # Generate audio
                                 try:
+                                    print(f"🎙️ Generating TTS with language: {session.language}")
                                     audio_path = await text_to_speech_cartesia(
                                         text_chunk,
                                         voice_id=session.voice_id,
