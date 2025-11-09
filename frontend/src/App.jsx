@@ -5,9 +5,13 @@ import axios from 'axios';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
-import LiveKitSessionDialog from './components/LiveKitSessionDialog';
 import './App.css';
-import './styles/quiz.css';
+
+// Import illustrations
+import heroIllustration from './illustrations/p10.svg';
+import uploadIllustration from './illustrations/p7.svg';
+import emptyStateIllustration from './illustrations/p8.svg';
+import tutorIllustration from './illustrations/p5.svg';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -18,8 +22,6 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [livekitSessionOpen, setLivekitSessionOpen] = useState(false);
-  const [livekitSelectedLecture, setLivekitSelectedLecture] = useState(null);
 
   // Refs for smooth scrolling
   const heroRef = useRef(null);
@@ -79,23 +81,13 @@ function AppContent() {
     }
   };
 
-  const handleStartSession = (lecture) => {
-    setLivekitSelectedLecture(lecture);
-    setLivekitSessionOpen(true);
-  };
-
-  const handleCloseSession = () => {
-    setLivekitSessionOpen(false);
-    setLivekitSelectedLecture(null);
-  };
-
   // Separate lectures into user's and demos
   const myLectures = lectures.filter(l => !l.is_demo);
   const demoLectures = lectures.filter(l => l.is_demo);
 
   return (
     <div className="app-container">
-      <Header 
+      <Header
         user={user}
         onLogin={loginWithGoogle}
         onLogout={logout}
@@ -104,59 +96,116 @@ function AppContent() {
         libraryRef={libraryRef}
         lecturesCount={lectures.length}
       />
-      
+
       {/* Hero Section */}
       <section ref={heroRef} className="section-hero" data-testid="hero-section">
-        <div className="container text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="mb-lg">Your AI-Powered Learning Platform</h1>
-            <p className="text-secondary" style={{ fontSize: '1.25rem', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
-              Upload lecture videos, get instant transcripts, and learn with an AI tutor that speaks in your professor's voice
-            </p>
-            <div className="flex gap-md justify-center" style={{ marginTop: '2rem' }}>
-              <button
-                className="glass-button-primary glass-button"
-                onClick={() => scrollToSection(uploadRef)}
-                data-testid="hero-upload-button"
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                </svg>
-                Upload Lecture
-              </button>
-              <button
-                className="glass-button"
-                onClick={() => scrollToSection(libraryRef)}
-                data-testid="hero-library-button"
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                View Library ({lectures.length})
-              </button>
-            </div>
-          </motion.div>
+        <div className="container">
+          <div className="grid grid-2" style={{ alignItems: 'center', gap: 'var(--space-4xl)' }}>
+            {/* Hero Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              style={{ textAlign: 'left' }}
+            >
+              <div style={{ display: 'inline-block', padding: '8px 20px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-full)', marginBottom: 'var(--space-xl)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: 'var(--edu-primary)' }}>
+                  🎓 AI-Powered Learning Platform
+                </p>
+              </div>
+              <h1 style={{ marginBottom: 'var(--space-xl)', fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 800 }}>
+                Learn Smarter with Voice-Powered AI Tutoring
+              </h1>
+              <p className="text-secondary" style={{ fontSize: '1.125rem', lineHeight: '1.7', marginBottom: 'var(--space-2xl)' }}>
+                Upload lecture videos, get instant transcripts, and interact with an AI tutor that speaks in your professor's voice. Transform your learning experience today.
+              </p>
+              <div className="flex gap-md" style={{ flexWrap: 'wrap' }}>
+                <button
+                  className="glass-button-primary glass-button"
+                  onClick={() => scrollToSection(uploadRef)}
+                  data-testid="hero-upload-button"
+                  style={{ padding: '14px 28px', fontSize: '1rem' }}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                  </svg>
+                  Upload Lecture
+                </button>
+                <button
+                  className="glass-button"
+                  onClick={() => scrollToSection(libraryRef)}
+                  data-testid="hero-library-button"
+                  style={{ padding: '14px 28px', fontSize: '1rem' }}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  Browse Library
+                  <span className="badge badge-primary">{lectures.length}</span>
+                </button>
+              </div>
+
+              {/* Feature Stats */}
+              <div className="flex gap-xl" style={{ marginTop: 'var(--space-3xl)', flexWrap: 'wrap' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--edu-primary)' }}>🎬</h3>
+                  <p className="text-secondary" style={{ fontSize: '0.875rem', margin: '4px 0 0 0' }}>
+                    Upload Videos
+                  </p>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--edu-secondary)' }}>🤖</h3>
+                  <p className="text-secondary" style={{ fontSize: '0.875rem', margin: '4px 0 0 0' }}>
+                    AI Tutoring
+                  </p>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--edu-accent)' }}>📝</h3>
+                  <p className="text-secondary" style={{ fontSize: '0.875rem', margin: '4px 0 0 0' }}>
+                    Smart Notes
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Hero Illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <img
+                src={heroIllustration}
+                alt="AI Learning Illustration"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  height: 'auto',
+                  filter: 'drop-shadow(0 10px 30px rgba(99, 102, 241, 0.2))'
+                }}
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Upload Section */}
-      <section ref={uploadRef} className="section" data-testid="upload-section">
+      <section ref={uploadRef} className="section" style={{ background: 'var(--surface)' }} data-testid="upload-section">
         <div className="container">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <h2 className="text-center mb-lg">Upload New Lecture</h2>
-            <p className="text-center text-secondary mb-2xl" style={{ fontSize: '1.125rem' }}>
-              {isAuthenticated ? 'Drop an MP4 video file to create an AI-powered tutor' : 'Sign in to upload your own lectures'}
-            </p>
-            <UploadSection 
+            <div className="text-center mb-3xl">
+              <h2 className="mb-md">Upload New Lecture</h2>
+              <p className="text-secondary" style={{ fontSize: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+                {isAuthenticated ? 'Upload MP4 videos or YouTube links to create an AI-powered tutor' : 'Sign in with Google to upload your own lectures and start learning'}
+              </p>
+            </div>
+            <UploadSection
               backendUrl={BACKEND_URL}
               onUploadComplete={handleUploadComplete}
               uploading={uploading}
@@ -178,22 +227,27 @@ function AppContent() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex justify-between items-center mb-2xl">
-              <h2>Lecture Library</h2>
+            <div className="flex justify-between items-center mb-3xl">
+              <div>
+                <h2 className="mb-sm">Lecture Library</h2>
+                <p className="text-secondary" style={{ fontSize: '0.9375rem' }}>
+                  Browse and manage your uploaded lectures
+                </p>
+              </div>
               <button
                 className="glass-button"
                 onClick={loadLectures}
                 disabled={loading}
                 data-testid="refresh-lectures-button"
               >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M1 4v6h6M23 20v-6h-6" />
                   <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" />
                 </svg>
                 Refresh
               </button>
             </div>
-            
+
             {loading ? (
               <div className="flex justify-center items-center" style={{ minHeight: '300px' }}>
                 <div className="spinner"></div>
@@ -203,19 +257,36 @@ function AppContent() {
                 {/* My Lectures Section */}
                 {isAuthenticated && (
                   <div className="mb-3xl">
-                    <h3 className="mb-lg">My Lectures ({myLectures.length})</h3>
+                    <div className="flex items-center gap-md mb-xl">
+                      <h3 style={{ margin: 0 }}>My Lectures</h3>
+                      <span className="badge badge-primary">{myLectures.length}</span>
+                    </div>
                     {myLectures.length === 0 ? (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="glass-card text-center"
-                        style={{ padding: 'var(--space-2xl)' }}
+                        className="glass-card text-center empty-state"
+                        style={{ padding: 'var(--space-3xl)' }}
                       >
-                        <p className="text-secondary">Upload your first lecture to get started</p>
+                        <img
+                          src={emptyStateIllustration}
+                          alt="No lectures yet"
+                          style={{
+                            width: '200px',
+                            height: 'auto',
+                            marginBottom: 'var(--space-xl)',
+                            opacity: 0.8
+                          }}
+                        />
+                        <h3 style={{ marginBottom: 'var(--space-sm)', fontWeight: 600 }}>No lectures yet</h3>
+                        <p className="text-secondary" style={{ marginBottom: 'var(--space-xl)' }}>Upload your first lecture to get started</p>
                         <button
-                          className="glass-button-primary glass-button mt-lg"
+                          className="glass-button-primary glass-button"
                           onClick={() => scrollToSection(uploadRef)}
                         >
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                          </svg>
                           Upload Lecture
                         </button>
                       </motion.div>
@@ -228,7 +299,6 @@ function AppContent() {
                             index={index}
                             onSelect={handleLectureSelect}
                             onDelete={handleDeleteLecture}
-                            onStartSession={handleStartSession}
                             canDelete={true}
                           />
                         ))}
@@ -240,7 +310,10 @@ function AppContent() {
                 {/* Demo Lectures Section */}
                 {demoLectures.length > 0 && (
                   <div>
-                    <h3 className="mb-lg">Demo Lectures ({demoLectures.length})</h3>
+                    <div className="flex items-center gap-md mb-xl">
+                      <h3 style={{ margin: 0 }}>Demo Lectures</h3>
+                      <span className="badge badge-demo">{demoLectures.length}</span>
+                    </div>
                     <div className="grid grid-3">
                       {demoLectures.map((lecture, index) => (
                         <LectureCard
@@ -249,7 +322,6 @@ function AppContent() {
                           index={index}
                           onSelect={handleLectureSelect}
                           onDelete={handleDeleteLecture}
-                          onStartSession={handleStartSession}
                           canDelete={false}
                         />
                       ))}
@@ -262,13 +334,20 @@ function AppContent() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="glass-card text-center"
+                    className="glass-card text-center empty-state"
                     style={{ padding: 'var(--space-4xl)' }}
                   >
-                    <svg width="80" height="80" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
-                      <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    <h3 className="mb-md">No lectures available</h3>
+                    <img
+                      src={emptyStateIllustration}
+                      alt="No lectures available"
+                      style={{
+                        width: '200px',
+                        height: 'auto',
+                        marginBottom: 'var(--space-xl)',
+                        opacity: 0.8
+                      }}
+                    />
+                    <h3 className="mb-md" style={{ fontWeight: 600 }}>No lectures available</h3>
                     <p className="text-secondary">Sign in to upload and manage your lectures</p>
                   </motion.div>
                 )}
@@ -309,7 +388,22 @@ function AppContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <h2 className="text-center mb-2xl">AI Tutor</h2>
+                <div className="text-center mb-3xl">
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-xl)' }}>
+                    <img
+                      src={tutorIllustration}
+                      alt="AI Tutor"
+                      style={{
+                        width: '120px',
+                        height: 'auto'
+                      }}
+                    />
+                  </div>
+                  <h2 className="mb-md">AI Tutor</h2>
+                  <p className="text-secondary" style={{ fontSize: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+                    Ask questions and get answers in your professor's voice
+                  </p>
+                </div>
                 <VoiceTutorInterfaceV2
                   lectureId={selectedLecture.id}
                   backendUrl={BACKEND_URL}
@@ -321,22 +415,22 @@ function AppContent() {
       )}
 
       {/* Footer */}
-      <footer style={{ background: 'var(--background-tertiary)', padding: 'var(--space-3xl) 0', textAlign: 'center' }}>
+      <footer style={{ background: 'var(--background-dark)', padding: 'var(--space-3xl) 0', textAlign: 'center', borderTop: '1px solid var(--surface-border)' }}>
         <div className="container">
-          <p className="text-secondary text-sm">
-            AI-Powered Learning Platform • {new Date().getFullYear()}
+          <div style={{ marginBottom: 'var(--space-lg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
+              <div style={{ fontSize: '1.5rem' }}>📚</div>
+              <h4 style={{ margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>EduVoice AI</h4>
+            </div>
+            <p className="text-secondary" style={{ fontSize: '0.875rem', margin: 0 }}>
+              Transform your learning with AI-powered voice tutoring
+            </p>
+          </div>
+          <p className="text-tertiary" style={{ fontSize: '0.8125rem', margin: 0 }}>
+            © {new Date().getFullYear()} EduVoice AI. All rights reserved.
           </p>
         </div>
       </footer>
-
-      {/* LiveKit Session Dialog */}
-      {livekitSelectedLecture && (
-        <LiveKitSessionDialog
-          open={livekitSessionOpen}
-          onClose={handleCloseSession}
-          lecture={livekitSelectedLecture}
-        />
-      )}
     </div>
   );
 }
@@ -483,13 +577,14 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
       )}
 
       <div
-        className={`glass-card ${dragActive ? 'drag-active' : ''}`}
+        className={`glass-card upload-dropzone ${dragActive ? 'drag-active' : ''}`}
         style={{
-          border: dragActive ? '2px dashed var(--accent-primary)' : '2px dashed var(--glass-light-border)',
-          background: dragActive ? 'rgba(0, 122, 255, 0.05)' : 'var(--glass-white)',
+          border: dragActive ? '2px dashed var(--edu-primary)' : '2px dashed var(--surface-border)',
+          background: dragActive ? 'rgba(99, 102, 241, 0.05)' : 'var(--surface)',
           textAlign: 'center',
           cursor: 'pointer',
-          transition: 'all 0.3s ease',
+          transition: 'all var(--transition-base)',
+          padding: 'var(--space-3xl)',
         }}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -506,18 +601,16 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
           style={{ display: 'none' }}
           disabled={uploading || youtubeProcessing}
         />
-        
+
         {uploading || youtubeProcessing ? (
           <div>
             <div className="spinner" style={{ margin: '0 auto var(--space-lg)' }}></div>
-            <h3 className="mb-md">{uploading ? 'Uploading and processing...' : 'Processing YouTube video...'}</h3>
-            <div style={{ width: '100%', background: 'var(--background-secondary)', borderRadius: 'var(--radius-full)', height: '8px', overflow: 'hidden' }}>
+            <h3 className="mb-md" style={{ fontWeight: 600 }}>{uploading ? 'Uploading and processing...' : 'Processing YouTube video...'}</h3>
+            <div className="progress-bar" style={{ maxWidth: '400px', margin: '0 auto' }}>
               <div
+                className="progress-fill"
                 style={{
                   width: uploading ? `${uploadProgress}%` : '100%',
-                  height: '100%',
-                  background: 'linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%)',
-                  transition: 'width 0.3s ease',
                   animation: youtubeProcessing ? 'shimmer 1.5s ease-in-out infinite' : 'none',
                 }}
               />
@@ -526,31 +619,44 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
           </div>
         ) : !isAuthenticated ? (
           <>
-            <svg width="64" height="64" fill="none" stroke="var(--text-tertiary)" strokeWidth="2" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
-              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            <h3 className="mb-sm">Sign in to upload lectures</h3>
-            <p className="text-secondary">Please sign in with Google to upload your own lecture videos</p>
+            <img
+              src={uploadIllustration}
+              alt="Upload Illustration"
+              style={{
+                width: '180px',
+                height: 'auto',
+                marginBottom: 'var(--space-lg)',
+                opacity: 0.7
+              }}
+            />
+            <h3 className="mb-sm" style={{ fontWeight: 600 }}>Sign in to upload lectures</h3>
+            <p className="text-secondary" style={{ fontSize: '0.9375rem' }}>Please sign in with Google to upload your own lecture videos</p>
           </>
         ) : (
           <>
-            <svg width="64" height="64" fill="none" stroke="var(--accent-primary)" strokeWidth="2" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
-              <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            <h3 className="mb-sm">Drop MP4 file here or click to browse</h3>
-            <p className="text-secondary">Maximum file size: 500MB</p>
+            <img
+              src={uploadIllustration}
+              alt="Upload Illustration"
+              style={{
+                width: '180px',
+                height: 'auto',
+                marginBottom: 'var(--space-lg)'
+              }}
+            />
+            <h3 className="mb-sm" style={{ fontWeight: 600 }}>Drop MP4 file here or click to browse</h3>
+            <p className="text-secondary" style={{ fontSize: '0.9375rem' }}>Supports MP4 format • Maximum file size: 500MB</p>
           </>
         )}
       </div>
-      
+
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="glass-card mt-lg"
-          style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.3)' }}
+          style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
         >
-          <p style={{ color: 'var(--accent-error)', textAlign: 'center', margin: 0 }}>{error}</p>
+          <p style={{ color: 'var(--edu-error)', textAlign: 'center', margin: 0, fontSize: '0.9375rem' }}>{error}</p>
         </motion.div>
       )}
 
@@ -645,7 +751,7 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
     try {
       setSummaryLoading(true);
       setSummaryError(null);
-      
+
       const response = await axios.post(`${backendUrl}/api/lectures/${lectureId}/summary`);
       setSummary(response.data);
     } catch (err) {
@@ -742,15 +848,15 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
             <p style={{ lineHeight: '1.8', marginBottom: 'var(--space-lg)' }}>
               {summary.summary}
             </p>
-            
+
             <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-lg)' }}>
               <div className="flex justify-between items-center" style={{ flexWrap: 'wrap', gap: 'var(--space-md)' }}>
                 <p className="text-secondary text-sm">
                   {summary.word_count} words • {summary.cached ? 'Cached' : 'Freshly generated'}
                 </p>
-                
-                <audio 
-                  controls 
+
+                <audio
+                  controls
                   src={`${backendUrl}${summary.audio_url}`}
                   style={{ maxWidth: '100%', height: '40px' }}
                   data-testid="summary-audio-player"
@@ -759,7 +865,7 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
                   Your browser does not support the audio element.
                 </audio>
               </div>
-              
+
               <div className="flex items-center gap-sm mt-md">
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
                   <path d="M11.983 1.907a.75.75 0 00-1.388-.341l-3.868 8.873-4.494.65a.75.75 0 00-.415 1.279l3.25 3.169-.768 4.478a.75.75 0 001.088.79L12 17.347l4.612 2.458a.75.75 0 001.088-.79l-.768-4.478 3.25-3.169a.75.75 0 00-.415-1.279l-4.494-.65-3.868-8.873a.75.75 0 00-.422-.35z" />
@@ -786,7 +892,7 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
 }
 
 // Lecture Card Component
-function LectureCard({ lecture, index, onSelect, onDelete, canDelete, onStartSession }) {
+function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -825,7 +931,7 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete, onStartSes
       </div>
       <button
         className="glass-button-primary glass-button"
-        style={{ width: '100%', justifyContent: 'center', marginBottom: '8px' }}
+        style={{ width: '100%', justifyContent: 'center' }}
         onClick={() => onSelect(lecture)}
         data-testid={`open-lecture-${lecture.id}`}
       >
@@ -833,22 +939,6 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete, onStartSes
           <path d="M8 5v14l11-7z" />
         </svg>
         Open AI Tutor
-      </button>
-      <button
-        className="glass-button"
-        style={{ 
-          width: '100%', 
-          justifyContent: 'center',
-          borderColor: '#007AFF',
-          color: '#007AFF'
-        }}
-        onClick={() => onStartSession(lecture)}
-        data-testid={`start-session-${lecture.id}`}
-      >
-        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
-        Start Session
       </button>
     </motion.div>
   );
