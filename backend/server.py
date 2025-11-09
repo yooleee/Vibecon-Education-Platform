@@ -686,8 +686,9 @@ async def generate_summary(lecture_id: str):
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
         print(f"🎙️ Generating audio with cloned voice: {voice_id}")
         
+        # Use the PLAIN text version for audio (no markdown)
         audio_path = await generate_summary_audio(
-            summary_data["summary"],
+            summary_data["summary_plain"],  # Use clean version
             voice_id=voice_id,
             language="en"
         )
