@@ -141,31 +141,21 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
         
         console.log(`🔊 Playing audio chunk (${audioQueue.length} remaining in queue)`);
         isPlayingQueue = true;
-        const audioData = audioQueue.shift();
+        const audioUrl = audioQueue.shift();
         
         try {
-          // Decode base64 and create blob
-          const binaryString = atob(audioData);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          const blob = new Blob([bytes], { type: 'audio/mpeg' });
-          const url = URL.createObjectURL(blob);
-          
-          // Play audio
+          // Play audio directly from URL
           if (audioRef.current) {
-            audioRef.current.src = url;
+            audioRef.current.src = `${backendUrl}${audioUrl}`;
             audioRef.current.onended = () => {
               console.log('✅ Audio chunk finished');
-              URL.revokeObjectURL(url);
               isPlayingQueue = false;
               setPlaying(false);
               playNextAudio(); // Play next in queue
             };
             await audioRef.current.play();
             setPlaying(true);
-            console.log('▶️ Audio playing');
+            console.log('▶️ Audio playing from URL:', audioUrl);
           }
         } catch (error) {
           console.error('❌ Audio playback error:', error);
