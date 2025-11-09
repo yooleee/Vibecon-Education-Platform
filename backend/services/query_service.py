@@ -70,7 +70,8 @@ async def text_to_speech(text: str) -> str:
         # For now, use OpenAI TTS as placeholder
         # Will integrate Cartesia Sonic 3 later
         client = AsyncOpenAI(
-            api_key=os.getenv("EMERGENT_LLM_KEY")
+            api_key=os.getenv("EMERGENT_LLM_KEY"),
+            base_url="https://api.emergentagi.com/v1"
         )
         
         response = await client.audio.speech.create(
