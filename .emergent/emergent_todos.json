@@ -1,10 +1,10 @@
 [
   {
     "content": "Fix authentication in LiveKitSessionDialog to use AuthContext instead of localStorage",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test LiveKit session with authenticated user",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
