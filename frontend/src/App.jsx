@@ -328,6 +328,15 @@ function AppContent() {
           </p>
         </div>
       </footer>
+
+      {/* LiveKit Session Dialog */}
+      {livekitSelectedLecture && (
+        <LiveKitSessionDialog
+          open={livekitSessionOpen}
+          onClose={handleCloseSession}
+          lecture={livekitSelectedLecture}
+        />
+      )}
     </div>
   );
 }
