@@ -6,11 +6,12 @@ import os
 import json
 from typing import List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
 import time
 import subprocess
 import shutil
+from livekit import api as livekit_api
 
 from services.audio_service import extract_audio_from_video
 from services.transcription_service import transcribe_audio
