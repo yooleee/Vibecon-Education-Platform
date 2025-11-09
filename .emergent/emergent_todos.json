@@ -53,10 +53,6 @@
   },
   {
     "content": "Check frontend for compilation errors and fix any issues",
-    "status": "in_progress"
-  },
-  {
-    "content": "Test complete quiz flow with voice interaction",
-    "status": "pending"
+    "status": "completed"
   }
 ]
