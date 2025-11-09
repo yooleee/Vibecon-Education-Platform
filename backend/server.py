@@ -187,9 +187,9 @@ async def query_lecture(request: QueryRequest):
         # Use the CLONED VOICE for response!
         from services.voice_service import text_to_speech_cartesia
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
-        print(f"🎙️ Using cloned professor voice: {voice_id}")
+        print(f"🎙️ Using cloned professor voice: {voice_id} in language: {request.language}")
         
-        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id)
+        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id, language=request.language)
         audio_filename = os.path.basename(audio_path)
         audio_url = f"/api/audio/{audio_filename}"
         
@@ -198,7 +198,8 @@ async def query_lecture(request: QueryRequest):
             "relevant_chunks": relevant_chunks,
             "audio_url": audio_url,
             "audio_path": audio_path,
-            "using_cloned_voice": voice_id != "a0e99841-438c-4a64-b679-ae501e7d6091"
+            "using_cloned_voice": voice_id != "a0e99841-438c-4a64-b679-ae501e7d6091",
+            "language": request.language
         }
     
     except Exception as e:
