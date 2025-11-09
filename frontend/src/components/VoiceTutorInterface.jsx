@@ -103,144 +103,51 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
       setProcessing(true);
       setError(null);
 
-      // Convert to form data
+      console.log('🎤 Sending voice message (non-streaming fallback)...');
+
+      // Temporarily use non-streaming endpoint to test audio
       const formData = new FormData();
       formData.append('audio', audioBlob, 'question.webm');
       formData.append('lecture_id', lectureId);
 
-      console.log('🎤 Sending voice message...');
+      const response = await axios.post(
+        `${backendUrl}/api/voice-query`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
-      // Use streaming endpoint
-      const response = await fetch(`${backendUrl}/api/voice-query-stream`, {
-        method: 'POST',
-        body: formData,
-      });
+      console.log('✅ Response received:', response.data);
 
-      if (!response.ok) {
-        throw new Error('Failed to process voice message');
-      }
-
-      console.log('✅ Connected to streaming endpoint');
-
-      // Handle SSE streaming
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      
-      let userMessage = null;
-      let assistantMessage = {
-        role: 'assistant',
-        content: '',
+      // Add user question
+      const userMessage = {
+        role: 'user',
+        content: response.data.question,
         timestamp: new Date().toISOString(),
       };
-      
-      const audioQueue = [];
-      let isPlayingQueue = false;
 
-      const playNextAudio = async () => {
-        if (isPlayingQueue || audioQueue.length === 0) return;
-        
-        console.log(`🔊 Playing audio chunk (${audioQueue.length} remaining in queue)`);
-        isPlayingQueue = true;
-        const audioData = audioQueue.shift();
-        
-        try {
-          // Decode base64 and create blob
-          const binaryString = atob(audioData);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          const blob = new Blob([bytes], { type: 'audio/mpeg' });
-          const url = URL.createObjectURL(blob);
-          
-          // Play audio
-          if (audioRef.current) {
-            audioRef.current.src = url;
-            audioRef.current.onended = () => {
-              URL.revokeObjectURL(url);
-              isPlayingQueue = false;
-              setPlaying(false);
-              playNextAudio(); // Play next in queue
-            };
-            await audioRef.current.play();
-            setPlaying(true);
-            console.log('▶️ Audio playing');
-          }
-        } catch (error) {
-          console.error('Audio playback error:', error);
-          isPlayingQueue = false;
-          playNextAudio(); // Try next chunk
-        }
+      // Add AI response
+      const assistantMessage = {
+        role: 'assistant',
+        content: response.data.answer,
+        audio_url: response.data.audio_url,
+        relevant_chunks: response.data.relevant_chunks,
+        timestamp: new Date().toISOString(),
       };
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          console.log('✅ Stream complete');
-          break;
-        }
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const event = JSON.parse(line.slice(6));
-              console.log('📨 Event:', event.type, event.data);
-              
-              if (event.type === 'question') {
-                // Add user message
-                userMessage = {
-                  role: 'user',
-                  content: event.data.text,
-                  timestamp: new Date().toISOString(),
-                };
-                setMessages((prev) => [...prev, userMessage]);
-              }
-              else if (event.type === 'start') {
-                // AI is thinking
-                setMessages((prev) => [...prev, assistantMessage]);
-              }
-              else if (event.type === 'text') {
-                // Update assistant message with new text
-                assistantMessage.content += ' ' + event.data.text;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[newMessages.length - 1] = { ...assistantMessage };
-                  return newMessages;
-                });
-              }
-              else if (event.type === 'audio') {
-                console.log('🎵 Received audio chunk, adding to queue');
-                // Queue audio for playback
-                audioQueue.push(event.data.audio);
-                playNextAudio();
-              }
-              else if (event.type === 'complete') {
-                // Response complete
-                console.log('✅ Response complete');
-                assistantMessage.content = event.data.full_response;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  newMessages[newMessages.length - 1] = { ...assistantMessage };
-                  return newMessages;
-                });
-              }
-              else if (event.type === 'error') {
-                console.error('❌ Stream error:', event.data.message);
-                setError(event.data.message);
-              }
-            } catch (e) {
-              console.error('Failed to parse SSE event:', e, 'Line:', line);
-            }
-          }
-        }
-      }
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      
+      // Auto-play the audio
+      console.log('🔊 Auto-playing audio:', response.data.audio_url);
+      setCurrentAudio(response.data.audio_url);
+      playAudio(response.data.audio_url);
 
     } catch (err) {
-      console.error('❌ Voice query error:', err);
-      setError(err.message || 'Failed to process voice message');
+      console.error('❌ Error:', err);
+      setError(err.response?.data?.detail || 'Failed to process voice message');
     } finally {
       setProcessing(false);
     }
