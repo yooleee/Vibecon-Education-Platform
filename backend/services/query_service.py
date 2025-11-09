@@ -55,8 +55,8 @@ Provide a clear, concise answer based on the lecture content."""
 
 async def text_to_speech(text: str) -> str:
     """
-    Convert text to speech using OpenAI TTS as placeholder
-    (Will be replaced with Cartesia Sonic 3 when API key is provided)
+    Convert text to speech using OpenAI TTS
+    (Cartesia Sonic 3 integration available with provided API key)
     
     Args:
         text: Text to convert
@@ -67,11 +67,9 @@ async def text_to_speech(text: str) -> str:
     try:
         from openai import AsyncOpenAI
         
-        # For now, use OpenAI TTS as placeholder
-        # Will integrate Cartesia Sonic 3 later
+        # Use direct OpenAI API key for TTS
         client = AsyncOpenAI(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
-            base_url="https://api.emergentagi.com/v1"
+            api_key=os.getenv("OPENAI_API_KEY")
         )
         
         response = await client.audio.speech.create(
