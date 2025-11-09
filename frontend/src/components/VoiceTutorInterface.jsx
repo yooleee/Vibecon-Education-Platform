@@ -70,7 +70,8 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true
+          autoGainControl: true,
+          sampleRate: 16000  // Optimal for Whisper
         } 
       });
       
@@ -78,6 +79,7 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
         mimeType: 'audio/webm'
       });
       audioChunksRef.current = [];
+      const startTime = Date.now();  // Track recording duration
 
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -87,13 +89,28 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
 
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        // Validate recording quality
+        const recordingDuration = Date.now() - startTime;
+        if (recordingDuration < 500) {
+          setError('Recording too short. Please hold the button while speaking (minimum 1 second).');
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        
+        if (audioBlob.size < 2000) {
+          setError('No audio detected. Please check your microphone and try again.');
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        
         await sendVoiceMessage(audioBlob);
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorderRef.current.start();
+      mediaRecorderRef.current.start(100);  // Collect data every 100ms
       setRecording(true);
       setError(null);
     } catch (err) {
