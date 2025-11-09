@@ -15,7 +15,13 @@ from services.query_service import answer_query, text_to_speech
 from utils.storage import save_lecture, load_lecture, list_lectures
 from utils.chunking import chunk_text
 
+# Import V2 router (LangGraph-based)
+from routers.graph_routes import router as graph_router
+
 app = FastAPI(title="EduVoice API")
+
+# Include V2 routes
+app.include_router(graph_router)
 
 # CORS configuration
 app.add_middleware(
