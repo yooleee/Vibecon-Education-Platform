@@ -233,7 +233,7 @@ async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)
         relevant_chunks = [lecture["chunks"][i] for i in top_indices]
         
         # Generate answer
-        answer = await answer_query(question_text, relevant_chunks)
+        answer = await answer_query(question_text, relevant_chunks, language)
         
         # Generate voice response with CLONED PROFESSOR VOICE in selected language!
         from services.voice_service import text_to_speech_cartesia
