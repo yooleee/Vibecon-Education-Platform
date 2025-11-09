@@ -838,6 +838,79 @@ async def generate_summary(lecture_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class LiveKitSessionRequest(BaseModel):
+    lecture_id: str
+
+
+class LiveKitSessionResponse(BaseModel):
+    token: str
+    url: str
+    room_name: str
+    lecture_title: str
+
+
+@app.post("/api/livekit/session/start", response_model=LiveKitSessionResponse)
+async def start_livekit_session(request: LiveKitSessionRequest, current_user: dict = Depends(get_current_user)):
+    """Start a LiveKit real-time voice session for a specific lecture"""
+    try:
+        # Load lecture data
+        lecture = load_lecture(request.lecture_id)
+        if not lecture:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        # Generate unique room name
+        room_name = f"lecture-{request.lecture_id}-{current_user['google_id']}-{int(datetime.now().timestamp())}"
+        
+        # Create LiveKit access token
+        livekit_url = os.getenv("LIVEKIT_URL")
+        livekit_api_key = os.getenv("LIVEKIT_API_KEY")
+        livekit_api_secret = os.getenv("LIVEKIT_API_SECRET")
+        
+        if not all([livekit_url, livekit_api_key, livekit_api_secret]):
+            raise HTTPException(status_code=500, detail="LiveKit credentials not configured")
+        
+        # Create token with agent dispatch metadata
+        token = livekit_api.AccessToken(livekit_api_key, livekit_api_secret)
+        token.identity = current_user['google_id']
+        token.name = current_user['name']
+        
+        # Add video grants
+        token.grants = livekit_api.VideoGrants(
+            room_join=True,
+            room=room_name,
+            can_publish=True,
+            can_subscribe=True
+        )
+        
+        # Set metadata for agent dispatch
+        agent_metadata = {
+            "lecture_id": request.lecture_id,
+            "user_id": current_user['google_id'],
+            "lecture_title": lecture.get("filename", "Unknown Lecture"),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        token.metadata = json.dumps(agent_metadata)
+        
+        # Generate JWT token
+        jwt_token = token.to_jwt()
+        
+        print(f"🎙️ Created LiveKit session: room={room_name}, lecture={request.lecture_id}, user={current_user['google_id']}")
+        
+        return LiveKitSessionResponse(
+            token=jwt_token,
+            url=livekit_url,
+            room_name=room_name,
+            lecture_title=lecture.get("filename", "Unknown Lecture")
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ LiveKit session creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
