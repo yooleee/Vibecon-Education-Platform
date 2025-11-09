@@ -490,6 +490,22 @@ function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
             </Alert>
           )}
 
+          {/* Quiz Trigger Button */}
+          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+            <QuizTriggerButton 
+              onClick={() => setShowQuizConfig(true)}
+              disabled={processing}
+            />
+          </Box>
+
+          {/* Quiz Config Modal */}
+          <QuizConfigModal
+            isOpen={showQuizConfig}
+            onClose={() => setShowQuizConfig(false)}
+            onStart={handleStartQuiz}
+            lectureId={lectureId}
+          />
+
           {/* Language Selector */}
           <Box sx={{ 
             display: 'flex', 
