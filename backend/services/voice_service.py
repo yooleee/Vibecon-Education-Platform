@@ -24,7 +24,7 @@ async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
     try:
         print(f"Cloning voice from: {audio_clip_path}")
         
-        # Clone the voice - this returns a complete voice object with ID
+        # Clone the voice - this returns a VoiceMetadata object
         with open(audio_clip_path, "rb") as audio_file:
             cloned_voice = cartesia_sync_client.voices.clone(
                 clip=audio_file,
@@ -35,8 +35,8 @@ async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
                 description=f"Cloned professor voice from lecture"
             )
         
-        # Extract voice ID from the returned voice object
-        voice_id = cloned_voice["id"]
+        # Access ID as attribute (not dictionary key)
+        voice_id = cloned_voice.id
         print(f"✓ Voice cloned successfully! Voice ID: {voice_id}")
         
         return voice_id
