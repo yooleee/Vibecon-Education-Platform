@@ -7,11 +7,17 @@ import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import './App.css';
 
-// Import illustrations
-import heroIllustration from './illustrations/p10.svg';
-import uploadIllustration from './illustrations/p7.svg';
-import emptyStateIllustration from './illustrations/p8.svg';
-import tutorIllustration from './illustrations/p5.svg';
+// Import illustrations (will be provided by user in next chat)
+// import heroIllustration from './illustrations/p10.svg';
+// import uploadIllustration from './illustrations/p7.svg';
+// import emptyStateIllustration from './illustrations/p8.svg';
+// import tutorIllustration from './illustrations/p5.svg';
+
+// Placeholder for illustrations until SVG files are provided
+const heroIllustration = null;
+const uploadIllustration = null;
+const emptyStateIllustration = null;
+const tutorIllustration = null;
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
