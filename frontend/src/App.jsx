@@ -249,6 +249,7 @@ function AppContent() {
                           index={index}
                           onSelect={handleLectureSelect}
                           onDelete={handleDeleteLecture}
+                          onStartSession={handleStartSession}
                           canDelete={false}
                         />
                       ))}
