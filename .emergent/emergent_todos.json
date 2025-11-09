@@ -1,27 +1,7 @@
 [
   {
-    "content": "Create session management API endpoint POST /api/v2/session/start",
-    "status": "completed"
-  },
-  {
-    "content": "Implement SSE streaming endpoint POST /api/v2/graph/query-stream with text-only POC",
-    "status": "completed"
-  },
-  {
-    "content": "Integrate Cartesia TTS with phrase-level buffering into graph",
-    "status": "completed"
-  },
-  {
-    "content": "Wire retrieval service (embeddings + top-k chunks) into graph",
-    "status": "completed"
-  },
-  {
-    "content": "Implement MongoDB persistence for conversation history",
-    "status": "completed"
-  },
-  {
     "content": "Test POC: Upload sample lecture and test v2 endpoints with conversation memory",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add frontend integration with v2 streaming endpoints",
