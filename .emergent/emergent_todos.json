@@ -29,10 +29,10 @@
   },
   {
     "content": "Restart backend service and start LiveKit agent worker",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test POC: manual test of token generation, agent greeting, basic conversation",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
