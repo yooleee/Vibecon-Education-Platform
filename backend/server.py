@@ -8,6 +8,7 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 import asyncio
+import time
 
 from services.audio_service import extract_audio_from_video
 from services.transcription_service import transcribe_audio
