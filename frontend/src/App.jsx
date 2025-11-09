@@ -32,7 +32,7 @@ import './App.css';
 import UploadLecture from './components/UploadLecture';
 import LectureList from './components/LectureList';
 import LectureViewer from './components/LectureViewer';
-import ChatInterface from './components/ChatInterface';
+import VoiceTutorInterface from './components/VoiceTutorInterface';
 
 const theme = createTheme({
   palette: {
