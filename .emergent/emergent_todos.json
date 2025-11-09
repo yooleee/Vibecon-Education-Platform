@@ -17,11 +17,11 @@
   },
   {
     "content": "Install livekit-client in frontend (yarn add livekit-client)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add Start Session button to LectureList component",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create SessionDialog component for LiveKit room connection",
