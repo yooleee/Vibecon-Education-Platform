@@ -12,7 +12,7 @@
     "status": "completed"
   },
   {
-    "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS",
+    "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS)",
     "status": "completed"
   },
   {
@@ -25,6 +25,10 @@
   },
   {
     "content": "Create SessionDialog component for LiveKit room connection",
+    "status": "completed"
+  },
+  {
+    "content": "Restart backend service and start LiveKit agent worker",
     "status": "in_progress"
   },
   {
