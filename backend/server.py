@@ -51,7 +51,7 @@ async def health_check():
 
 @app.post("/api/upload")
 async def upload_lecture(file: UploadFile = File(...)):
-    """Upload and process a lecture video"""
+    """Upload and process a lecture video with voice cloning"""
     try:
         # Validate file type
         if not file.filename.endswith(('.mp4', '.MP4')):
@@ -70,16 +70,35 @@ async def upload_lecture(file: UploadFile = File(...)):
         audio_path = os.path.join(UPLOAD_DIR, f"{lecture_id}.wav")
         extract_audio_from_video(video_path, audio_path)
         
+        # STEP 1: Extract best voice clip for cloning (5-10 seconds)
+        print(f"\n🎤 Analyzing audio to find best voice sample...")
+        from services.audio_analysis_service import extract_best_voice_clip
+        voice_clip_path, clip_quality = extract_best_voice_clip(
+            audio_path, 
+            clip_duration=8.0,  # 8 seconds is optimal
+            num_candidates=10
+        )
+        
+        # STEP 2: Clone the voice using Cartesia
+        print(f"\n🔬 Cloning professor's voice...")
+        from services.voice_service import clone_voice_from_audio
+        cloned_voice_id = await clone_voice_from_audio(
+            voice_clip_path,
+            voice_name=f"Professor {lecture_id[:8]}"
+        )
+        
         # Transcribe audio
+        print(f"\n📝 Transcribing lecture...")
         transcript = await transcribe_audio(audio_path)
         
         # Chunk transcript
         chunks = chunk_text(transcript)
         
         # Generate embeddings for each chunk
+        print(f"\n🧠 Generating embeddings...")
         embeddings = await generate_embeddings(chunks)
         
-        # Save lecture data
+        # Save lecture data with cloned voice ID
         lecture_data = {
             "id": lecture_id,
             "filename": file.filename,
@@ -88,16 +107,23 @@ async def upload_lecture(file: UploadFile = File(...)):
             "chunks": chunks,
             "embeddings": embeddings,
             "video_path": video_path,
-            "audio_path": audio_path
+            "audio_path": audio_path,
+            "cloned_voice_id": cloned_voice_id,  # Store the cloned voice ID!
+            "voice_clip_path": voice_clip_path,
+            "voice_clip_quality": clip_quality
         }
         
         save_lecture(lecture_id, lecture_data)
+        
+        print(f"\n✅ Lecture processed successfully with cloned voice!")
         
         return {
             "lecture_id": lecture_id,
             "filename": file.filename,
             "status": "processed",
-            "chunks_count": len(chunks)
+            "chunks_count": len(chunks),
+            "cloned_voice_id": cloned_voice_id,
+            "voice_cloning_quality": clip_quality["quality_score"]
         }
     
     except Exception as e:
