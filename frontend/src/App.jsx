@@ -98,6 +98,7 @@ function AppContent() {
         scrollToSection={scrollToSection}
         uploadRef={uploadRef}
         libraryRef={libraryRef}
+        quizHistoryRef={quizHistoryRef}
         lecturesCount={lectures.length}
       />
 
