@@ -23,6 +23,7 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [chatMode, setChatMode] = useState('standard'); // 'standard' or 'livekit'
 
   // Refs for smooth scrolling
   const heroRef = useRef(null);
