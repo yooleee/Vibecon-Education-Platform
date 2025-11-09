@@ -125,29 +125,25 @@ Provide a clear, concise answer based on the lecture content."""
                                 "data": {"text": sentence}
                             }
                             
-                            # Generate and send audio in background
+                            # Generate and send audio URL (not base64!)
                             try:
                                 print(f"🎙️ Generating TTS...")
                                 audio_path = await text_to_speech_cartesia(sentence, voice_id=cloned_voice_id)
-                                print(f"✅ TTS generated: {os.path.basename(audio_path)}")
+                                audio_filename = os.path.basename(audio_path)
+                                audio_url = f"/api/audio/{audio_filename}"
+                                print(f"✅ TTS generated: {audio_url}")
                                 
-                                # Read audio file and encode as base64
-                                with open(audio_path, "rb") as f:
-                                    audio_bytes = f.read()
-                                    audio_data = base64.b64encode(audio_bytes).decode('utf-8')
-                                
-                                print(f"📤 Sending audio ({len(audio_data)} chars)")
+                                # Send audio URL instead of base64 data
+                                print(f"📤 Sending audio URL")
                                 yield {
                                     "type": "audio",
                                     "data": {
-                                        "audio": audio_data,
+                                        "audio_url": audio_url,
                                         "text": sentence
                                     }
                                 }
                                 
-                                # Clean up audio file
-                                os.remove(audio_path)
-                                print("🗑️ Audio file cleaned up")
+                                # Don't delete - let it be served via /api/audio endpoint
                                 
                             except Exception as e:
                                 print(f"❌ TTS error: {e}")
