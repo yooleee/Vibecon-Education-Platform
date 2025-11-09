@@ -45,7 +45,7 @@ const theme = createTheme({
   },
 });
 
-const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
 
 function App() {
   const [currentTab, setCurrentTab] = useState(0);
