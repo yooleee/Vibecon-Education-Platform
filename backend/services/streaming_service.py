@@ -193,7 +193,7 @@ Provide a clear, concise answer based on the lecture content. {lang_instruction}
             
             # Generate audio for remaining text
             try:
-                print(f"🎙️ Generating final TTS...")
+                print("🎙️ Generating final TTS...")
                 audio_path = await text_to_speech_cartesia(remaining, voice_id=cloned_voice_id, language=language)
                 audio_filename = os.path.basename(audio_path)
                 audio_url = f"/api/audio/{audio_filename}"
