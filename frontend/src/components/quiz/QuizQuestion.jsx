@@ -42,6 +42,13 @@ function QuizQuestion({ question, questionNumber, totalQuestions, audioUrl, voic
           <audio ref={audioRef} controls src={`${process.env.REACT_APP_BACKEND_URL || ''}${audioUrl}`} style={{ width: '100%', height: '40px' }} data-testid="question-audio">
             Your browser does not support the audio element.
           </audio>
+          
+          {/* Voice instructions for MCQ/True-False */}
+          {(question.question_type === 'multiple_choice' || question.question_type === 'true_false') && (
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: 'var(--space-sm)', fontStyle: 'italic', textAlign: 'center' }}>
+              💡 Answer by saying the option (e.g., "Option A" or "True") or click below
+            </p>
+          )}
         </div>
       )}
     </motion.div>
