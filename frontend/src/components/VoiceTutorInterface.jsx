@@ -120,6 +120,7 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'question.webm');
       formData.append('lecture_id', lectureId);
+      formData.append('language', selectedLanguage);  // Add language parameter
 
       // Use streaming endpoint
       const response = await fetch(`${backendUrl}/api/voice-query-stream`, {
