@@ -25,11 +25,11 @@
   },
   {
     "content": "Check frontend for compilation errors before testing",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test quiz generation flow with voice and text modes",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test quiz results display and saving to database",
