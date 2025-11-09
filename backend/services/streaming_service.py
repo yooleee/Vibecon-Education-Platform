@@ -110,6 +110,8 @@ Provide a clear, concise answer based on the lecture content."""
                 # Process each complete sentence
                 for sentence in sentences:
                     if sentence:
+                        print(f"📝 Complete sentence: {sentence[:50]}...")
+                        
                         # Send text immediately
                         yield {
                             "type": "text",
@@ -118,12 +120,15 @@ Provide a clear, concise answer based on the lecture content."""
                         
                         # Generate and send audio
                         try:
+                            print(f"🎙️ Generating TTS for sentence...")
                             audio_path = await text_to_speech_cartesia(sentence, voice_id=cloned_voice_id)
+                            print(f"✅ TTS generated: {audio_path}")
                             
                             # Read audio file and encode as base64
                             with open(audio_path, "rb") as f:
                                 audio_data = base64.b64encode(f.read()).decode('utf-8')
                             
+                            print(f"📤 Sending audio chunk ({len(audio_data)} bytes base64)")
                             yield {
                                 "type": "audio",
                                 "data": {
@@ -136,7 +141,7 @@ Provide a clear, concise answer based on the lecture content."""
                             os.remove(audio_path)
                             
                         except Exception as e:
-                            print(f"TTS error: {e}")
+                            print(f"❌ TTS error: {e}")
                             yield {
                                 "type": "error",
                                 "data": {"message": f"TTS failed: {str(e)}"}
