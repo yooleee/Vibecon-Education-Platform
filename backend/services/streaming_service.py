@@ -160,7 +160,7 @@ Provide a clear, concise answer based on the lecture content. {lang_instruction}
                             # Generate and send audio URL
                             try:
                                 print(f"🎙️ Generating TTS for {word_count} words...")
-                                audio_path = await text_to_speech_cartesia(text_chunk, voice_id=cloned_voice_id)
+                                audio_path = await text_to_speech_cartesia(text_chunk, voice_id=cloned_voice_id, language=language)
                                 audio_filename = os.path.basename(audio_path)
                                 audio_url = f"/api/audio/{audio_filename}"
                                 print(f"✅ TTS ready: {audio_url}")
