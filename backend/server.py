@@ -9,6 +9,8 @@ import uuid
 from datetime import datetime
 import asyncio
 import time
+import subprocess
+import shutil
 
 from services.audio_service import extract_audio_from_video
 from services.transcription_service import transcribe_audio
@@ -24,6 +26,39 @@ from middleware.auth import get_current_user, get_current_user_optional
 
 # Import V2 router (LangGraph-based)
 from routers.graph_routes import router as graph_router
+
+# Check for ffmpeg on startup and attempt auto-install
+def check_and_install_ffmpeg():
+    """Check if ffmpeg is installed, attempt to install if missing"""
+    if shutil.which("ffmpeg") is None:
+        print("⚠️  WARNING: ffmpeg not found - attempting auto-installation...")
+        try:
+            subprocess.run(
+                ["sudo", "apt-get", "update", "-qq"],
+                check=True,
+                capture_output=True
+            )
+            subprocess.run(
+                ["sudo", "DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y", "ffmpeg"],
+                check=True,
+                capture_output=True
+            )
+            print("✅ ffmpeg auto-installed successfully!")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to auto-install ffmpeg: {e}")
+            print("   Please run manually: sudo apt-get install -y ffmpeg")
+        except Exception as e:
+            print(f"❌ Error during ffmpeg installation: {e}")
+    else:
+        ffmpeg_version = subprocess.run(
+            ["ffmpeg", "-version"],
+            capture_output=True,
+            text=True
+        ).stdout.split('\n')[0]
+        print(f"✅ ffmpeg found: {ffmpeg_version}")
+
+# Run ffmpeg check on startup
+check_and_install_ffmpeg()
 
 app = FastAPI(title="EduVoice API")
 
