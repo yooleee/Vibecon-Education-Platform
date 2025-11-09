@@ -12,7 +12,8 @@ from services.audio_service import extract_audio_from_video
 from services.transcription_service import transcribe_audio
 from services.embedding_service import generate_embeddings, compute_similarity
 from services.query_service import answer_query, text_to_speech
-from utils.storage import save_lecture, load_lecture, list_lectures
+from services.youtube_service import download_youtube_audio, validate_youtube_url
+from utils.storage import save_lecture, load_lecture, list_lectures, delete_lecture
 from utils.chunking import chunk_text
 
 # Import V2 router (LangGraph-based)
