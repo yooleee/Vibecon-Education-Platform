@@ -1,11 +1,11 @@
 [
   {
     "content": "Update voice_service.py to use sonic-3 model instead of sonic-english for multilingual support",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test multilingual voice responses with Hindi and Spanish selections",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Verify English still works correctly with sonic-3 model",
