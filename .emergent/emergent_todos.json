@@ -1,11 +1,11 @@
 [
   {
     "content": "Install LiveKit dependencies in backend (livekit-api, livekit-agents with plugins, deepgram)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add LiveKit credentials to backend .env (LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create backend endpoint POST /api/livekit/session/start for token generation",
