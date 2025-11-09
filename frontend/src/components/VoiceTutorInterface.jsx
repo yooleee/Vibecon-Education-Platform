@@ -206,9 +206,9 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
                 });
               }
               else if (event.type === 'audio') {
-                console.log('🎵 Received audio chunk (' + event.data.audio.length + ' chars base64)');
-                // Queue audio for playback
-                audioQueue.push(event.data.audio);
+                console.log('🎵 Received audio URL:', event.data.audio_url);
+                // Queue audio URL for playback
+                audioQueue.push(event.data.audio_url);
                 playNextAudio();
               }
               else if (event.type === 'complete') {
