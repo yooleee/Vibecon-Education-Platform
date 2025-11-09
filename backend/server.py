@@ -52,6 +52,10 @@ class TTSRequest(BaseModel):
     text: str
 
 
+class YouTubeRequest(BaseModel):
+    youtube_url: str
+
+
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "EduVoice API"}
