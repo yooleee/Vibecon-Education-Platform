@@ -207,8 +207,8 @@ async def query_lecture(request: QueryRequest):
 
 
 @app.post("/api/voice-query-stream")
-async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = File(...)):
-    """Streaming voice-first query - OPTIMIZED with parallel processing"""
+async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = File(...), language: str = Form("en")):
+    """Streaming voice-first query - OPTIMIZED with parallel processing and multilingual support"""
     try:
         import asyncio
         
@@ -245,7 +245,7 @@ async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = Fi
         # Get cloned voice ID
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
         
-        # Stream the response with optimized chunk sizes
+        # Stream the response with optimized chunk sizes and language support
         from services.streaming_service import stream_voice_response
         
         async def event_generator():
@@ -253,8 +253,8 @@ async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = Fi
             # Send question first
             yield f"data: {json.dumps({'type': 'question', 'data': {'text': question_text}})}\n\n"
             
-            # Stream AI response with phrase-level audio
-            async for event in stream_voice_response(question_text, relevant_chunks, voice_id):
+            # Stream AI response with phrase-level audio and language support
+            async for event in stream_voice_response(question_text, relevant_chunks, voice_id, language):
                 yield f"data: {json.dumps(event)}\n\n"
         
         return StreamingResponse(
