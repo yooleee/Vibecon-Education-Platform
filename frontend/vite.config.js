@@ -14,7 +14,7 @@ export default defineConfig({
   },
   define: {
     // Expose REACT_APP_ variables for compatibility with existing code
-    'process.env.REACT_APP_BACKEND_URL': JSON.stringify(process.env.REACT_APP_BACKEND_URL || 'https://design-preview-34.preview.emergentagent.com'),
+    'process.env.REACT_APP_BACKEND_URL': JSON.stringify(process.env.REACT_APP_BACKEND_URL || 'https://smart-quiz-ai-2.preview.emergentagent.com'),
     'process.env.REACT_APP_GOOGLE_CLIENT_ID': JSON.stringify(process.env.REACT_APP_GOOGLE_CLIENT_ID || '1080095233905-rtm89un5d1lsgh6ro8m3qtk1omojqop0.apps.googleusercontent.com'),
   },
   envPrefix: ['VITE_', 'REACT_APP_'], // Allow both prefixes
