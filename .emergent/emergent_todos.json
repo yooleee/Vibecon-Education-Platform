@@ -1,34 +1,34 @@
 [
   {
-    "content": "Create MongoDB session and conversation models with UUID + UTC",
-    "status": "completed"
-  },
-  {
-    "content": "Implement minimal StateGraph with MessagesState in /backend/graph/graph.py",
-    "status": "completed"
-  },
-  {
     "content": "Create session management API endpoint POST /api/v2/session/start",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Implement SSE streaming endpoint POST /api/v2/graph/query-stream with text-only POC",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Integrate Cartesia TTS with phrase-level buffering into graph",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Wire retrieval service (embeddings + top-k chunks) into graph",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Implement MongoDB persistence for conversation history",
+    "status": "completed"
+  },
+  {
+    "content": "Test POC: Upload sample lecture and test v2 endpoints with conversation memory",
     "status": "pending"
   },
   {
-    "content": "Test POC: latency (≤3s first audio), follow-up memory, multilingual support",
+    "content": "Add frontend integration with v2 streaming endpoints",
+    "status": "pending"
+  },
+  {
+    "content": "Run comprehensive testing via testing_agent",
     "status": "pending"
   }
 ]
