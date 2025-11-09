@@ -14,7 +14,8 @@ from services.transcription_service import transcribe_audio
 from services.voice_service import text_to_speech_cartesia
 from services.streaming_service import SentenceBuffer
 from utils.storage import load_lecture
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_openai import ChatOpenAI
 import uuid
 
 router = APIRouter(prefix="/api/v2", tags=["graph"])
