@@ -147,7 +147,7 @@ function App() {
                 lectureId={selectedLecture.id}
                 backendUrl={BACKEND_URL}
               />
-              <VoiceTutorInterface
+              <VoiceTutorInterfaceV2
                 lectureId={selectedLecture.id}
                 backendUrl={BACKEND_URL}
               />
