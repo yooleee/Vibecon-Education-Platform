@@ -5,11 +5,11 @@
   },
   {
     "content": "Add LiveKit credentials to backend .env (LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create backend endpoint POST /api/livekit/session/start for token generation",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS",
