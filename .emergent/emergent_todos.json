@@ -1,38 +1,10 @@
 [
   {
-    "content": "Install LiveKit dependencies in backend (livekit-api, livekit-agents with plugins, deepgram)",
-    "status": "completed"
+    "content": "Fix authentication in LiveKitSessionDialog to use AuthContext instead of localStorage",
+    "status": "in_progress"
   },
   {
-    "content": "Add LiveKit credentials to backend .env (LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)",
-    "status": "completed"
-  },
-  {
-    "content": "Create backend endpoint POST /api/livekit/session/start for token generation",
-    "status": "completed"
-  },
-  {
-    "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS)",
-    "status": "completed"
-  },
-  {
-    "content": "Install livekit-client in frontend (yarn add livekit-client)",
-    "status": "completed"
-  },
-  {
-    "content": "Add Start Session button to LectureList component",
-    "status": "completed"
-  },
-  {
-    "content": "Create SessionDialog component for LiveKit room connection",
-    "status": "completed"
-  },
-  {
-    "content": "Restart backend service and start LiveKit agent worker",
-    "status": "completed"
-  },
-  {
-    "content": "Test POC: manual test of token generation, agent greeting, basic conversation",
-    "status": "completed"
+    "content": "Test LiveKit session with authenticated user",
+    "status": "pending"
   }
 ]
