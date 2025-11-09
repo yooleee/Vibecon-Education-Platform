@@ -1,25 +1,41 @@
 import React, { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 function Header({ user, onLogin, onLogout, scrollToSection, uploadRef, libraryRef, lecturesCount }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      // tokenResponse contains the access token
-      // We need to get the ID token for backend verification
       try {
+        // Get user info from Google using the access token
+        const userInfoResponse = await axios.get(
+          'https://www.googleapis.com/oauth2/v3/userinfo',
+          {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+          }
+        );
+
+        // Get ID token by calling tokeninfo endpoint
+        const tokenInfoResponse = await axios.get(
+          `https://oauth2.googleapis.com/tokeninfo?access_token=${tokenResponse.access_token}`
+        );
+
+        // For backend, we need to send the access token
+        // Backend will verify it with Google
         const result = await onLogin(tokenResponse.access_token);
+        
         if (!result.success) {
-          alert('Login failed. Please try again.');
+          alert(result.error || 'Login failed. Please try again.');
         }
       } catch (error) {
         console.error('Login error:', error);
         alert('Login failed. Please try again.');
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Google login error:', error);
       alert('Google login failed');
     },
   });
