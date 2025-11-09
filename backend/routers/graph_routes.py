@@ -9,6 +9,7 @@ import os
 from graph.graph import create_conversation_graph
 from graph.memory import ConversationMemory
 from graph.state import ConversationState
+from graph.nodes import retrieve_node, persist_node
 from services.transcription_service import transcribe_audio
 from services.voice_service import text_to_speech_cartesia
 from services.streaming_service import SentenceBuffer
