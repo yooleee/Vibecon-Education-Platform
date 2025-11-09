@@ -1,18 +1,38 @@
 [
   {
-    "content": "Research Cartesia emotion and SSML features",
-    "status": "completed"
+    "content": "Update LectureViewer.jsx to add 'Start Quiz' button next to 'Generate Summary' button",
+    "status": "pending"
   },
   {
-    "content": "Update AI prompts to be more friendly and include emotion tags",
-    "status": "completed"
+    "content": "Add quiz state management in LectureViewer (showQuiz, quizSessionId, quizCompleted)",
+    "status": "pending"
   },
   {
-    "content": "Clean conversation history display (remove emotion tags and symbols)",
-    "status": "completed"
+    "content": "Implement handleStartQuiz function to call POST /api/quiz/session/start",
+    "status": "pending"
   },
   {
-    "content": "Test the enhanced voice with emotions",
-    "status": "completed"
+    "content": "Integrate QuizInterface component into LectureViewer with conditional rendering",
+    "status": "pending"
+  },
+  {
+    "content": "Add Quiz History navigation item to Header component",
+    "status": "pending"
+  },
+  {
+    "content": "Create Quiz History section in App.jsx with quiz history display",
+    "status": "pending"
+  },
+  {
+    "content": "Test quiz generation flow with voice and text modes",
+    "status": "pending"
+  },
+  {
+    "content": "Test quiz results display and saving to database",
+    "status": "pending"
+  },
+  {
+    "content": "Verify mobile responsiveness of quiz UI",
+    "status": "pending"
   }
 ]
