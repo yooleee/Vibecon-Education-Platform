@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import './App.css';
 
 const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
