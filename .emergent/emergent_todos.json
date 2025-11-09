@@ -1,19 +1,15 @@
 [
   {
-    "content": "Install LangGraph dependencies (langgraph, langchain, langchain-openai) and restart backend",
+    "content": "Create MongoDB session and conversation models with UUID + UTC",
     "status": "completed"
   },
   {
-    "content": "Create MongoDB session and conversation models with UUID + UTC",
-    "status": "in_progress"
-  },
-  {
     "content": "Implement minimal StateGraph with MessagesState in /backend/graph/graph.py",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Create session management API endpoint POST /api/v2/session/start",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Implement SSE streaming endpoint POST /api/v2/graph/query-stream with text-only POC",
