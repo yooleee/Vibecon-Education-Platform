@@ -763,6 +763,12 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
   const [summary, setSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState(null);
+  
+  // Quiz state
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizSessionId, setQuizSessionId] = useState(null);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState(null);
 
   useEffect(() => {
     loadLecture();
@@ -795,6 +801,41 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
     } finally {
       setSummaryLoading(false);
     }
+  };
+
+  const handleStartQuiz = async () => {
+    try {
+      setQuizLoading(true);
+      setQuizError(null);
+
+      // Default settings: 5 questions, medium difficulty, all types, voice mode
+      const response = await axios.post(`${backendUrl}/api/quiz/session/start`, {
+        lecture_id: lectureId,
+        num_questions: 5,
+        question_types: ['multiple_choice', 'true_false', 'open_ended'],
+        difficulty: 'medium',
+        voice_mode: true
+      });
+
+      setQuizSessionId(response.data.session_id);
+      setShowQuiz(true);
+    } catch (err) {
+      setQuizError('Failed to start quiz. Please try again.');
+      console.error('Quiz error:', err);
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const handleQuizClose = () => {
+    setShowQuiz(false);
+    setQuizSessionId(null);
+  };
+
+  const handleQuizComplete = () => {
+    // Quiz completed, close the interface
+    setShowQuiz(false);
+    setQuizSessionId(null);
   };
 
   if (loading) {
@@ -846,24 +887,72 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
         </div>
       </div>
 
-      {/* Summary Section */}
-      <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
-        <div className="flex justify-between items-center mb-lg">
-          <h3>Lecture Summary</h3>
-          {!summary && (
-            <button
-              className="glass-button-primary glass-button"
-              onClick={handleGenerateSummary}
-              disabled={summaryLoading}
-              data-testid="generate-summary-button"
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              {summaryLoading ? 'Generating...' : 'Generate Summary'}
-            </button>
-          )}
+      {/* Quiz Section */}
+      {showQuiz && quizSessionId ? (
+        <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
+          <QuizInterface
+            sessionId={quizSessionId}
+            lectureId={lectureId}
+            voiceMode={true}
+            onClose={handleQuizClose}
+            onComplete={handleQuizComplete}
+          />
         </div>
+      ) : (
+        <>
+          {/* Quiz Trigger */}
+          <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
+            <div className="flex justify-between items-center mb-lg">
+              <h3>Quiz</h3>
+              <button
+                className="glass-button-primary glass-button"
+                onClick={handleStartQuiz}
+                disabled={quizLoading}
+                data-testid="start-quiz-button"
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {quizLoading ? 'Starting Quiz...' : 'Start Quiz'}
+              </button>
+            </div>
+
+            {quizLoading && (
+              <div className="flex items-center gap-md mb-lg">
+                <div className="spinner" style={{ width: '24px', height: '24px' }}></div>
+                <p className="text-secondary">Generating quiz questions... This may take a moment.</p>
+              </div>
+            )}
+
+            {quizError && (
+              <div className="glass-card mb-lg" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.3)' }}>
+                <p style={{ color: 'var(--accent-error)', margin: 0 }}>{quizError}</p>
+              </div>
+            )}
+
+            <div className="glass-card" style={{ background: 'var(--background-secondary)' }}>
+              <p className="text-secondary">Test your knowledge with a 5-question quiz about this lecture. Answer using voice or text.</p>
+            </div>
+          </div>
+
+          {/* Summary Section */}
+          <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
+            <div className="flex justify-between items-center mb-lg">
+              <h3>Lecture Summary</h3>
+              {!summary && (
+                <button
+                  className="glass-button-primary glass-button"
+                  onClick={handleGenerateSummary}
+                  disabled={summaryLoading}
+                  data-testid="generate-summary-button"
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {summaryLoading ? 'Generating...' : 'Generate Summary'}
+                </button>
+              )}
+            </div>
 
         {summaryLoading && (
           <div className="flex items-center gap-md mb-lg">
@@ -912,7 +1001,9 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
             </div>
           </div>
         )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
