@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Card,
@@ -10,6 +10,9 @@ import {
   List,
   ListItem,
   ListItemText,
+  Stepper,
+  Step,
+  StepLabel,
 } from '@mui/material';
 import { CloudUpload, CheckCircle } from '@mui/icons-material';
 import axios from 'axios';
@@ -21,6 +24,39 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [progressStage, setProgressStage] = useState('');
+  const [progressMessage, setProgressMessage] = useState('');
+  const [activeStep, setActiveStep] = useState(0);
+  const eventSourceRef = useRef(null);
+
+  const steps = [
+    'Uploading',
+    'Extracting Audio',
+    'Analyzing Quality',
+    'Processing (Parallel)',
+    'Generating Embeddings',
+    'Finalizing'
+  ];
+
+  const stageToStep = {
+    'uploading': 0,
+    'extracting': 1,
+    'analyzing': 2,
+    'parallel_processing': 3,
+    'chunking': 3,
+    'embeddings': 4,
+    'saving': 5,
+    'completed': 6
+  };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup event source on unmount
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -55,6 +91,46 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
     setDragging(false);
   };
 
+  const subscribeToProgress = (lectureId) => {
+    // Close existing connection if any
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const eventSource = new EventSource(`${backendUrl}/api/upload-progress/${lectureId}`);
+    eventSourceRef.current = eventSource;
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      setProgress(data.progress || 0);
+      setProgressStage(data.stage || '');
+      setProgressMessage(data.message || '');
+      
+      // Update stepper
+      const stepIndex = stageToStep[data.stage] || 0;
+      setActiveStep(stepIndex);
+
+      if (data.status === 'completed') {
+        setResult(data.result);
+        setUploading(false);
+        eventSource.close();
+        if (onUploadComplete) {
+          onUploadComplete();
+        }
+      } else if (data.status === 'error') {
+        setError(data.message || 'Upload failed');
+        setUploading(false);
+        eventSource.close();
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource error:', error);
+      eventSource.close();
+    };
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
 
@@ -64,7 +140,8 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
     try {
       setUploading(true);
       setError(null);
-      setProgress(20);
+      setProgress(0);
+      setActiveStep(0);
 
       const response = await axios.post(
         `${backendUrl}/api/upload`,
@@ -73,34 +150,21 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 50) / progressEvent.total
-            );
-            setProgress(percentCompleted);
-          },
         }
       );
 
-      // Simulate processing progress
-      setProgress(60);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProgress(80);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProgress(100);
+      // Start listening to progress updates
+      subscribeToProgress(response.data.lecture_id);
 
-      setResult(response.data);
-      setSelectedFile(null);
-      
-      if (onUploadComplete) {
-        onUploadComplete();
+      // The actual result will come through SSE, but we can set initial data
+      if (response.data.status === 'processed') {
+        setResult(response.data);
+        setSelectedFile(null);
       }
     } catch (err) {
       setError(err.response?.data?.detail || 'Upload failed. Please try again.');
       console.error('Upload error:', err);
-    } finally {
       setUploading(false);
-      setTimeout(() => setProgress(0), 1000);
     }
   };
 
@@ -112,7 +176,7 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
             Upload Lecture Video
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Upload an MP4 lecture video to create an AI-powered tutor
+            Upload an MP4 lecture video to create an AI-powered tutor (faster processing with parallel optimization)
           </Typography>
 
           <Box
@@ -156,14 +220,20 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
 
           {uploading && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" gutterBottom>
-                Processing lecture... This may take a few minutes.
+              <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
+                {steps.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+              
+              <Typography variant="body2" gutterBottom fontWeight="bold">
+                {progressMessage}
               </Typography>
-              <LinearProgress variant="determinate" value={progress} />
-              <Typography variant="caption" sx={{ mt: 1 }}>
-                {progress < 50 && 'Uploading video...'}
-                {progress >= 50 && progress < 80 && 'Extracting audio and transcribing...'}
-                {progress >= 80 && 'Generating embeddings...'}
+              <LinearProgress variant="determinate" value={progress} sx={{ mb: 1 }} />
+              <Typography variant="caption" color="text.secondary">
+                {progress}% complete
               </Typography>
             </Box>
           )}
@@ -184,6 +254,12 @@ function UploadLecture({ backendUrl, onUploadComplete }) {
                   <ListItemText 
                     primary="Chunks Created" 
                     secondary={result.chunks_count} 
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText 
+                    primary="Voice Cloning Quality" 
+                    secondary={`${(result.voice_cloning_quality || 0).toFixed(2)}/100`} 
                   />
                 </ListItem>
               </List>
