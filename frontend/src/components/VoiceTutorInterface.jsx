@@ -34,12 +34,20 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
   const [currentAudio, setCurrentAudio] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
+  const [selectedLanguage, setSelectedLanguage] = useState('en'); // Language state
   
   const messagesEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const audioRef = useRef(null);
   const animationRef = useRef(null);
+
+  // Language options
+  const languages = [
+    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'es', label: 'Spanish', flag: '🇪🇸' },
+    { code: 'hi', label: 'Hindi', flag: '🇮🇳' },
+  ];
 
   useEffect(() => {
     scrollToBottom();
