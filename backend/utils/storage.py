@@ -70,3 +70,43 @@ def list_lectures() -> List[Dict]:
     lectures.sort(key=lambda x: x["upload_date"], reverse=True)
     
     return lectures
+
+
+def delete_lecture(lecture_id: str) -> bool:
+    """
+    Delete lecture and all associated files
+    
+    Args:
+        lecture_id: Unique lecture identifier
+    
+    Returns:
+        True if deletion was successful, False otherwise
+    """
+    try:
+        # Load lecture to get file paths
+        lecture = load_lecture(lecture_id)
+        
+        if not lecture:
+            return False
+        
+        # Delete associated files
+        files_to_delete = [
+            lecture.get("video_path"),
+            lecture.get("audio_path"),
+            lecture.get("voice_clip_path")
+        ]
+        
+        for file_path in files_to_delete:
+            if file_path and os.path.exists(file_path):
+                os.remove(file_path)
+        
+        # Delete lecture JSON file
+        json_file = os.path.join(LECTURE_DIR, f"{lecture_id}.json")
+        if os.path.exists(json_file):
+            os.remove(json_file)
+        
+        return True
+    
+    except Exception as e:
+        print(f"Error deleting lecture {lecture_id}: {str(e)}")
+        return False
