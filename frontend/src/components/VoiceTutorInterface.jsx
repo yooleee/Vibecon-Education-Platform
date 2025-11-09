@@ -103,42 +103,125 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
       setProcessing(true);
       setError(null);
 
-      // Convert to WAV for better compatibility
+      // Convert to form data
       const formData = new FormData();
       formData.append('audio', audioBlob, 'question.webm');
       formData.append('lecture_id', lectureId);
 
-      const response = await axios.post(
-        `${backendUrl}/api/voice-query`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      // Use streaming endpoint
+      const response = await fetch(`${backendUrl}/api/voice-query-stream`, {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Add user question
-      const userMessage = {
-        role: 'user',
-        content: response.data.question,
-        timestamp: new Date().toISOString(),
-      };
+      if (!response.ok) {
+        throw new Error('Failed to process voice message');
+      }
 
-      // Add AI response
-      const assistantMessage = {
+      // Handle SSE streaming
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      let userMessage = null;
+      let assistantMessage = {
         role: 'assistant',
-        content: response.data.answer,
-        audio_url: response.data.audio_url,
-        relevant_chunks: response.data.relevant_chunks,
+        content: '',
+        audio_chunks: [],
         timestamp: new Date().toISOString(),
       };
+      
+      const audioQueue = [];
+      let isPlayingQueue = false;
 
-      setMessages((prev) => [...prev, userMessage, assistantMessage]);
-      setCurrentAudio(response.data.audio_url);
+      const playNextAudio = async () => {
+        if (isPlayingQueue || audioQueue.length === 0) return;
+        
+        isPlayingQueue = true;
+        const audioData = audioQueue.shift();
+        
+        // Decode base64 and create blob
+        const binaryString = atob(audioData);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        
+        // Play audio
+        if (audioRef.current) {
+          audioRef.current.src = url;
+          audioRef.current.onended = () => {
+            URL.revokeObjectURL(url);
+            isPlayingQueue = false;
+            setPlaying(false);
+            playNextAudio(); // Play next in queue
+          };
+          await audioRef.current.play();
+          setPlaying(true);
+        }
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const event = JSON.parse(line.slice(6));
+              
+              if (event.type === 'question') {
+                // Add user message
+                userMessage = {
+                  role: 'user',
+                  content: event.data.text,
+                  timestamp: new Date().toISOString(),
+                };
+                setMessages((prev) => [...prev, userMessage]);
+              }
+              else if (event.type === 'start') {
+                // AI is thinking
+                setMessages((prev) => [...prev, assistantMessage]);
+              }
+              else if (event.type === 'text') {
+                // Update assistant message with new text
+                assistantMessage.content += ' ' + event.data.text;
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  newMessages[newMessages.length - 1] = { ...assistantMessage };
+                  return newMessages;
+                });
+              }
+              else if (event.type === 'audio') {
+                // Queue audio for playback
+                audioQueue.push(event.data.audio);
+                playNextAudio();
+              }
+              else if (event.type === 'complete') {
+                // Response complete
+                assistantMessage.content = event.data.full_response;
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  newMessages[newMessages.length - 1] = { ...assistantMessage };
+                  return newMessages;
+                });
+              }
+              else if (event.type === 'error') {
+                setError(event.data.message);
+              }
+            } catch (e) {
+              console.error('Failed to parse SSE event:', e);
+            }
+          }
+        }
+      }
 
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to process voice message');
+      setError(err.message || 'Failed to process voice message');
       console.error('Voice query error:', err);
     } finally {
       setProcessing(false);
