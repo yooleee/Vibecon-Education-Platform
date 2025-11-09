@@ -181,15 +181,15 @@ async def query_lecture(request: QueryRequest):
         top_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)[:3]
         relevant_chunks = [lecture["chunks"][i] for i in top_indices]
         
-        # Generate answer using GPT-4o
-        answer = await answer_query(request.question, relevant_chunks)
+        # Generate answer using GPT-4o with language support
+        answer = await answer_query(request.question, relevant_chunks, request.language)
         
         # Use the CLONED VOICE for response!
         from services.voice_service import text_to_speech_cartesia
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
         print(f"🎙️ Using cloned professor voice: {voice_id}")
         
-        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id)
+        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id, language=request.language)
         audio_filename = os.path.basename(audio_path)
         audio_url = f"/api/audio/{audio_filename}"
         
@@ -198,7 +198,8 @@ async def query_lecture(request: QueryRequest):
             "relevant_chunks": relevant_chunks,
             "audio_url": audio_url,
             "audio_path": audio_path,
-            "using_cloned_voice": voice_id != "a0e99841-438c-4a64-b679-ae501e7d6091"
+            "using_cloned_voice": voice_id != "a0e99841-438c-4a64-b679-ae501e7d6091",
+            "language": request.language
         }
     
     except Exception as e:
