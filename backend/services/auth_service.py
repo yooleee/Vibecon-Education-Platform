@@ -5,8 +5,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional, Dict
 from jose import JWTError, jwt
-from google.auth.transport import requests
-from google.oauth2 import id_token
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,36 +19,37 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 
-def verify_google_token(token: str) -> Optional[Dict]:
+def verify_google_token(access_token: str) -> Optional[Dict]:
     """
-    Verify Google OAuth token and return user info
+    Verify Google OAuth access token and return user info
     
     Args:
-        token: Google ID token from frontend
+        access_token: Google access token from frontend
     
     Returns:
         User info dictionary or None if invalid
     """
     try:
-        # Verify the token with Google
-        idinfo = id_token.verify_oauth2_token(
-            token, 
-            requests.Request(), 
-            GOOGLE_CLIENT_ID
+        # Use Google's userinfo endpoint to get user data
+        response = requests.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            headers={'Authorization': f'Bearer {access_token}'}
         )
         
-        # Token is valid, return user info
+        if response.status_code != 200:
+            print(f"Google API error: {response.status_code}")
+            return None
+        
+        user_info = response.json()
+        
+        # Return standardized user info
         return {
-            'google_id': idinfo['sub'],
-            'email': idinfo['email'],
-            'name': idinfo.get('name', ''),
-            'picture': idinfo.get('picture', '')
+            'google_id': user_info['sub'],
+            'email': user_info['email'],
+            'name': user_info.get('name', ''),
+            'picture': user_info.get('picture', '')
         }
     
-    except ValueError as e:
-        # Invalid token
-        print(f"Invalid Google token: {str(e)}")
-        return None
     except Exception as e:
         print(f"Error verifying Google token: {str(e)}")
         return None
