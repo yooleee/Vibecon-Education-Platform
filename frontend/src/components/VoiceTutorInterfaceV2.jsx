@@ -49,6 +49,11 @@ function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
   const [audioProgress, setAudioProgress] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   
+  // Quiz state
+  const [showQuizConfig, setShowQuizConfig] = useState(false);
+  const [quizSession, setQuizSession] = useState(null);
+  const [quizActive, setQuizActive] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
