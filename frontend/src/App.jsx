@@ -32,6 +32,7 @@ function AppContent() {
   const libraryRef = useRef(null);
   const viewerRef = useRef(null);
   const tutorRef = useRef(null);
+  const quizHistoryRef = useRef(null);
 
   useEffect(() => {
     loadLectures();
