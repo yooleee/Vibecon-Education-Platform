@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional
 import json
 import os
+import re
 
 from graph.graph import create_conversation_graph
 from graph.memory import ConversationMemory
@@ -25,6 +26,32 @@ memory = ConversationMemory()
 
 # Create graph (singleton)
 conversation_graph = create_conversation_graph()
+
+
+def clean_text_for_display(text: str) -> str:
+    """
+    Remove emotion tags, SSML markup, and special symbols from text for display.
+    This keeps the voice expressive while showing clean text to users.
+    """
+    # Remove Cartesia emotion tags
+    text = re.sub(r'<cartesia:emotion[^>]*>', '', text)
+    text = re.sub(r'</cartesia:emotion>', '', text)
+    
+    # Remove SSML tags (break, strong, emphasis, etc.)
+    text = re.sub(r'<break[^>]*/?>', '', text)
+    text = re.sub(r'<strong>', '', text)
+    text = re.sub(r'</strong>', '', text)
+    text = re.sub(r'<emphasis[^>]*>', '', text)
+    text = re.sub(r'</emphasis>', '', text)
+    
+    # Remove markdown bold/italic symbols
+    text = re.sub(r'\*\*([^\*]+)\*\*', r'\1', text)  # **bold**
+    text = re.sub(r'\*([^\*]+)\*', r'\1', text)      # *italic*
+    
+    # Clean up any extra whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text
 
 
 class SessionStartRequest(BaseModel):
