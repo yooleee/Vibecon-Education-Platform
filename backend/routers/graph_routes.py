@@ -300,6 +300,7 @@ Remember: Your emotion tags and markup will be used for voice generation but won
                 
                 sentence_buffer = SentenceBuffer()
                 full_response = ""
+                full_response_clean = ""  # Clean version for display
                 
                 async for chunk in llm.astream(llm_messages):
                     if chunk.content:
@@ -311,32 +312,39 @@ Remember: Your emotion tags and markup will be used for voice generation but won
                         
                         for text_chunk in chunks_to_speak:
                             if text_chunk and len(text_chunk.strip()) > 3:
-                                # Send text
-                                yield f"data: {json.dumps({'type': 'text', 'data': {'text': text_chunk}})}\n\n"
+                                # Clean the text for display (remove emotion tags, SSML, etc.)
+                                clean_chunk = clean_text_for_display(text_chunk)
+                                full_response_clean += clean_chunk + " "
                                 
-                                # Generate audio
+                                # Send clean text to display
+                                yield f"data: {json.dumps({'type': 'text', 'data': {'text': clean_chunk}})}\n\n"
+                                
+                                # Generate audio with the FULL text (including emotion/SSML markup)
                                 try:
-                                    print(f"🎙️ Generating TTS with language: {session.language}")
+                                    print(f"🎙️ Generating TTS with emotions/SSML, language: {session.language}")
                                     audio_path = await text_to_speech_cartesia(
-                                        text_chunk,
+                                        text_chunk,  # Use full text with emotions for TTS
                                         voice_id=session.voice_id,
                                         language=session.language
                                     )
                                     audio_filename = os.path.basename(audio_path)
                                     audio_url = f"/api/audio/{audio_filename}"
                                     
-                                    yield f"data: {json.dumps({'type': 'audio', 'data': {'audio_url': audio_url, 'text': text_chunk}})}\n\n"
+                                    yield f"data: {json.dumps({'type': 'audio', 'data': {'audio_url': audio_url, 'text': clean_chunk}})}\n\n"
                                 except Exception as e:
                                     print(f"❌ TTS error: {e}")
                 
                 # Flush remaining buffer
                 remaining = sentence_buffer.flush()
                 if remaining and len(remaining.strip()) > 3:
-                    yield f"data: {json.dumps({'type': 'text', 'data': {'text': remaining}})}\n\n"
+                    clean_remaining = clean_text_for_display(remaining)
+                    full_response_clean += clean_remaining
+                    
+                    yield f"data: {json.dumps({'type': 'text', 'data': {'text': clean_remaining}})}\n\n"
                     
                     try:
                         audio_path = await text_to_speech_cartesia(
-                            remaining,
+                            remaining,  # Use full text with emotions for TTS
                             voice_id=session.voice_id,
                             language=session.language
                         )
