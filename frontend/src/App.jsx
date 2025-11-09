@@ -219,51 +219,35 @@ function AppContent() {
                     <h3 className="mb-lg">Demo Lectures ({demoLectures.length})</h3>
                     <div className="grid grid-3">
                       {demoLectures.map((lecture, index) => (
-                  <motion.div
-                    key={lecture.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="glass-card"
-                    data-testid={`lecture-card-${lecture.id}`}
-                  >
-                    <div className="flex justify-between items-start mb-md">
-                      <div style={{ flex: 1 }}>
-                        <h4 className="mb-sm">{lecture.filename}</h4>
-                        <p className="text-secondary text-sm">
-                          Uploaded: {new Date(lecture.upload_date).toLocaleDateString()}
-                        </p>
-                        <p className="text-tertiary text-sm mt-sm">
-                          {lecture.chunks_count} chunks
-                        </p>
-                      </div>
-                      <button
-                        className="glass-button-danger"
-                        style={{ padding: '8px', borderRadius: 'var(--radius-sm)' }}
-                        onClick={() => handleDeleteLecture(lecture.id)}
-                        data-testid={`delete-lecture-${lecture.id}`}
-                        title="Delete lecture"
-                      >
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                        <LectureCard
+                          key={lecture.id}
+                          lecture={lecture}
+                          index={index}
+                          onSelect={handleLectureSelect}
+                          onDelete={handleDeleteLecture}
+                          canDelete={false}
+                        />
+                      ))}
                     </div>
-                    <button
-                      className="glass-button-primary glass-button"
-                      style={{ width: '100%', justifyContent: 'center' }}
-                      onClick={() => handleLectureSelect(lecture)}
-                      data-testid={`open-lecture-${lecture.id}`}
-                    >
-                      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      Open AI Tutor
-                    </button>
+                  </div>
+                )}
+
+                {/* No lectures at all */}
+                {!isAuthenticated && demoLectures.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="glass-card text-center"
+                    style={{ padding: 'var(--space-4xl)' }}
+                  >
+                    <svg width="80" height="80" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
+                      <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <h3 className="mb-md">No lectures available</h3>
+                    <p className="text-secondary">Sign in to upload and manage your lectures</p>
                   </motion.div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </motion.div>
         </div>
