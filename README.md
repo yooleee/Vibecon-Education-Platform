@@ -83,7 +83,7 @@ JWT_SECRET_KEY=your-secret-key-here
 **Frontend** (`/app/frontend/.env`):
 ```env
 # Backend URL (Production configured - DO NOT MODIFY)
-REACT_APP_BACKEND_URL=https://your-app.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://voice-edu-quiz.preview.emergentagent.com
 
 # Google OAuth Client ID
 REACT_APP_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
