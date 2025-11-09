@@ -1,18 +1,18 @@
 [
   {
     "content": "Research Cartesia emotion and SSML features",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update AI prompts to be more friendly and include emotion tags",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Clean conversation history display (remove emotion tags and symbols)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test the enhanced voice with emotions",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
