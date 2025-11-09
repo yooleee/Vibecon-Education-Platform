@@ -1,22 +1,22 @@
 [
   {
-    "content": "Apply updated index.css and App.css files",
-    "status": "completed"
+    "content": "Investigate current multilingual implementation in backend",
+    "status": "in_progress"
   },
   {
-    "content": "Apply updated App.jsx file with new UI changes",
-    "status": "completed"
+    "content": "Fix multilingual responses not working properly",
+    "status": "pending"
   },
   {
-    "content": "Apply updated VoiceTutorInterfaceV2.jsx and VoiceTutorInterfaceV2.css files",
-    "status": "completed"
+    "content": "Research and implement LiveKit integration",
+    "status": "pending"
   },
   {
-    "content": "Verify frontend compiles without errors",
-    "status": "completed"
+    "content": "Test multilingual feature with all languages",
+    "status": "pending"
   },
   {
-    "content": "Take screenshots to verify UI changes are applied correctly",
-    "status": "completed"
+    "content": "Test LiveKit feature end-to-end",
+    "status": "pending"
   }
 ]
