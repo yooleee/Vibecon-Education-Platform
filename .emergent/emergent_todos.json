@@ -9,23 +9,23 @@
   },
   {
     "content": "Create quiz service with LLM integration (quiz_service.py) for question generation and evaluation",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create QuizSession and QuizResult MongoDB models (models/quiz.py)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Create quiz routes (routers/quiz_routes.py) with session management endpoints",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add quiz routes to server.py and test backend with curl",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Create QuizTriggerButton component in VoiceTutorInterfaceV2.jsx",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create QuizConfigModal for quiz settings (questions count, types, mode)",
