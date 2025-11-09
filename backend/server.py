@@ -879,23 +879,24 @@ async def start_livekit_session(request: LiveKitSessionRequest, current_user: di
             room_join=True,
             room=room_name,
             can_publish=True,
-            can_subscribe=True
+            can_subscribe=True,
+            can_publish_data=True
         )
         
-        # Set metadata for agent dispatch
-        agent_metadata = {
+        # Set attributes for agent dispatch (not metadata)
+        agent_attributes = {
             "lecture_id": request.lecture_id,
             "user_id": current_user['google_id'],
             "lecture_title": lecture.get("filename", "Unknown Lecture"),
-            "timestamp": datetime.now().isoformat()
         }
         
-        token.metadata = json.dumps(agent_metadata)
+        token.attributes = agent_attributes
         
         # Generate JWT token
         jwt_token = token.to_jwt()
         
         print(f"🎙️ Created LiveKit session: room={room_name}, lecture={request.lecture_id}, user={current_user['google_id']}")
+        print(f"🔑 Token identity: {current_user['google_id']}, room: {room_name}")
         
         return LiveKitSessionResponse(
             token=jwt_token,
