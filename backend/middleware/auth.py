@@ -1,16 +1,17 @@
 """
 Authentication middleware
 """
-from fastapi import HTTPException, Security, Depends
+from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from services.auth_service import verify_access_token
 from models.user import load_user_by_google_id
 from typing import Optional
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     """
     Get current authenticated user from JWT token
     
@@ -42,7 +43,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
     return user
 
 
-def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Security(security, auto_error=False)) -> Optional[dict]:
+def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)) -> Optional[dict]:
     """
     Get current user if authenticated, None otherwise
     
