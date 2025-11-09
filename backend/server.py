@@ -480,10 +480,11 @@ async def upload_youtube_lecture(request: YouTubeRequest, current_user: dict = D
 
 
 @app.get("/api/lectures")
-async def get_lectures():
-    """List all uploaded lectures"""
+async def get_lectures(current_user: Optional[dict] = Depends(get_current_user_optional)):
+    """List lectures - shows user's lectures + demos"""
     try:
-        lectures = list_lectures()
+        user_id = current_user['google_id'] if current_user else None
+        lectures = list_lectures(user_id)
         return {"lectures": lectures}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
