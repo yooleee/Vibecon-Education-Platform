@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import LiveKitVoiceChat from './components/LiveKitVoiceChat';
+import QuizInterface from './components/quiz/QuizInterface';
 import './App.css';
 
 // Import illustrations
