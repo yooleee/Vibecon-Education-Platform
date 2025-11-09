@@ -18,9 +18,22 @@ import {
 import LiveKitSessionDialog from './LiveKitSessionDialog';
 
 function LectureList({ lectures, loading, onSelectLecture, onRefresh }) {
+  const [livekitSessionOpen, setLivekitSessionOpen] = useState(false);
+  const [selectedLecture, setSelectedLecture] = useState(null);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  const handleStartSession = (lecture) => {
+    setSelectedLecture(lecture);
+    setLivekitSessionOpen(true);
+  };
+
+  const handleCloseSession = () => {
+    setLivekitSessionOpen(false);
+    setSelectedLecture(null);
   };
 
   if (loading) {
