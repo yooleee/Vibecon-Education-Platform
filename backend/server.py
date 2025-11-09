@@ -133,12 +133,15 @@ async def upload_lecture(file: UploadFile = File(...)):
             "message": "Analyzing audio quality..."
         })
         print(f"\n🎤 Analyzing audio to find best voice sample...")
+        analysis_start = time.time()
         from services.audio_analysis_service import extract_best_voice_clip
         voice_clip_path, clip_quality = extract_best_voice_clip(
             audio_path, 
             clip_duration=8.0,  # 8 seconds is optimal
             num_candidates=5  # Reduced from 10 to 5 for faster processing
         )
+        analysis_time = time.time() - analysis_start
+        print(f"⏱️ Audio analysis completed in {analysis_time:.2f}s")
         
         # STEP 2 & 3: Run voice cloning and transcription IN PARALLEL for speed
         upload_progress[lecture_id].update({
@@ -147,6 +150,7 @@ async def upload_lecture(file: UploadFile = File(...)):
             "message": "Cloning voice and transcribing (parallel)..."
         })
         print(f"\n⚡ Starting parallel processing (voice cloning + transcription)...")
+        parallel_start = time.time()
         from services.voice_service import clone_voice_from_audio
         
         # Run both tasks concurrently
@@ -157,7 +161,8 @@ async def upload_lecture(file: UploadFile = File(...)):
             ),
             transcribe_audio(audio_path)
         )
-        
+        parallel_time = time.time() - parallel_start
+        print(f"⏱️ Parallel processing completed in {parallel_time:.2f}s")
         print(f"✅ Parallel processing complete!")
         
         # Chunk transcript
