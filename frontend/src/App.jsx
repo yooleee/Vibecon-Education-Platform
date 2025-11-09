@@ -317,7 +317,7 @@ function AppContent() {
 }
 
 // Upload Section Component
-function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, uploadProgress, setUploadProgress }) {
+function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, uploadProgress, setUploadProgress, isAuthenticated }) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
   const [showYouTubeModal, setShowYouTubeModal] = useState(false);
