@@ -81,7 +81,6 @@ function AppContent() {
 
   return (
     <div className="app-container">
-      {/* Temporarily commented out to debug
       <Header 
         user={user}
         onLogin={loginWithGoogle}
@@ -91,7 +90,6 @@ function AppContent() {
         libraryRef={libraryRef}
         lecturesCount={lectures.length}
       />
-      */}
       
       {/* Hero Section */}
       <section ref={heroRef} className="section-hero" data-testid="hero-section">
