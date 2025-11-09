@@ -1,14 +1,14 @@
 [
   {
     "content": "Investigate current multilingual implementation in backend",
+    "status": "completed"
+  },
+  {
+    "content": "Fix multilingual language parameter handling",
     "status": "in_progress"
   },
   {
-    "content": "Fix multilingual responses not working properly",
-    "status": "pending"
-  },
-  {
-    "content": "Research and implement LiveKit integration",
+    "content": "Add LiveKit integration to frontend",
     "status": "pending"
   },
   {
