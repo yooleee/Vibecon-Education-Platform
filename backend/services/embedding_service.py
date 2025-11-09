@@ -7,10 +7,9 @@ from typing import List
 
 load_dotenv()
 
-# Initialize OpenAI client with Emergent LLM key
+# Initialize OpenAI client with direct OpenAI API key for embeddings
 client = AsyncOpenAI(
-    api_key=os.getenv("EMERGENT_LLM_KEY"),
-    base_url="https://api.emergentagi.com/v1"
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 
