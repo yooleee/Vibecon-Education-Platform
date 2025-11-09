@@ -156,7 +156,7 @@ function AppContent() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex justify-between items-center mb-2xl">
-              <h2>My Lectures ({lectures.length})</h2>
+              <h2>Lecture Library</h2>
               <button
                 className="glass-button"
                 onClick={loadLectures}
@@ -175,28 +175,50 @@ function AppContent() {
               <div className="flex justify-center items-center" style={{ minHeight: '300px' }}>
                 <div className="spinner"></div>
               </div>
-            ) : lectures.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="glass-card text-center"
-                style={{ padding: 'var(--space-4xl)' }}
-              >
-                <svg width="80" height="80" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
-                  <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <h3 className="mb-md">No lectures uploaded yet</h3>
-                <p className="text-secondary">Upload your first lecture to get started with AI-powered tutoring</p>
-                <button
-                  className="glass-button-primary glass-button mt-xl"
-                  onClick={() => scrollToSection(uploadRef)}
-                >
-                  Upload Your First Lecture
-                </button>
-              </motion.div>
             ) : (
-              <div className="grid grid-3">
-                {lectures.map((lecture, index) => (
+              <>
+                {/* My Lectures Section */}
+                {isAuthenticated && (
+                  <div className="mb-3xl">
+                    <h3 className="mb-lg">My Lectures ({myLectures.length})</h3>
+                    {myLectures.length === 0 ? (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="glass-card text-center"
+                        style={{ padding: 'var(--space-2xl)' }}
+                      >
+                        <p className="text-secondary">Upload your first lecture to get started</p>
+                        <button
+                          className="glass-button-primary glass-button mt-lg"
+                          onClick={() => scrollToSection(uploadRef)}
+                        >
+                          Upload Lecture
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <div className="grid grid-3">
+                        {myLectures.map((lecture, index) => (
+                          <LectureCard
+                            key={lecture.id}
+                            lecture={lecture}
+                            index={index}
+                            onSelect={handleLectureSelect}
+                            onDelete={handleDeleteLecture}
+                            canDelete={true}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Demo Lectures Section */}
+                {demoLectures.length > 0 && (
+                  <div>
+                    <h3 className="mb-lg">Demo Lectures ({demoLectures.length})</h3>
+                    <div className="grid grid-3">
+                      {demoLectures.map((lecture, index) => (
                   <motion.div
                     key={lecture.id}
                     initial={{ opacity: 0, y: 20 }}
