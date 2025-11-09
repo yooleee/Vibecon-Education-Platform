@@ -17,11 +17,15 @@
   },
   {
     "content": "Add Quiz History navigation item to Header component",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create Quiz History section in App.jsx with quiz history display",
-    "status": "pending"
+    "status": "completed"
+  },
+  {
+    "content": "Check frontend for compilation errors before testing",
+    "status": "in_progress"
   },
   {
     "content": "Test quiz generation flow with voice and text modes",
