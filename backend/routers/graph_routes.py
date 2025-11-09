@@ -203,9 +203,6 @@ async def query_graph_stream(
                 # Stream reasoning with TTS
                 print("🧠 Streaming reasoning node...")
                 
-                # Import nodes
-                from graph.nodes import retrieve_node
-                
                 # Language instructions
                 language_instructions = {
                     "en": "Respond in English.",
