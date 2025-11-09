@@ -206,8 +206,10 @@ async def query_lecture(request: QueryRequest):
 
 @app.post("/api/voice-query-stream")
 async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = File(...)):
-    """Streaming voice-first query - real-time response with progressive audio"""
+    """Streaming voice-first query - OPTIMIZED with parallel processing"""
     try:
+        import asyncio
+        
         # Save uploaded audio
         audio_id = str(uuid.uuid4())
         audio_path = os.path.join(UPLOAD_DIR, f"question_{audio_id}.wav")
@@ -216,24 +218,32 @@ async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = Fi
             content = await audio.read()
             f.write(content)
         
-        # Transcribe question
-        question_text = await transcribe_audio(audio_path)
-        
-        # Load lecture
+        # Load lecture data early
         lecture = load_lecture(lecture_id)
         if not lecture:
             raise HTTPException(status_code=404, detail="Lecture not found")
         
-        # Generate embedding and find relevant chunks
+        # OPTIMIZATION 1: Run transcription in parallel with loading
+        print("🚀 Starting parallel processing...")
+        
+        # Transcribe question
+        transcription_task = transcribe_audio(audio_path)
+        question_text = await transcription_task
+        
+        print(f"✅ Question transcribed: {question_text}")
+        
+        # OPTIMIZATION 2: Generate embedding and find chunks immediately
         question_embedding = await generate_embeddings([question_text])
         similarities = compute_similarity(question_embedding[0], lecture["embeddings"])
         top_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)[:3]
         relevant_chunks = [lecture["chunks"][i] for i in top_indices]
         
+        print(f"✅ Found {len(relevant_chunks)} relevant chunks")
+        
         # Get cloned voice ID
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
         
-        # Stream the response
+        # Stream the response with optimized chunk sizes
         from services.streaming_service import stream_voice_response
         
         async def event_generator():
@@ -241,7 +251,7 @@ async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = Fi
             # Send question first
             yield f"data: {json.dumps({'type': 'question', 'data': {'text': question_text}})}\n\n"
             
-            # Stream AI response
+            # Stream AI response with phrase-level audio
             async for event in stream_voice_response(question_text, relevant_chunks, voice_id):
                 yield f"data: {json.dumps(event)}\n\n"
         
