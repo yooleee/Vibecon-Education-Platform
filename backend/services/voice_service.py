@@ -24,32 +24,19 @@ async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
     try:
         print(f"Cloning voice from: {audio_clip_path}")
         
-        # Clone the voice (synchronous operation)
-        # Open file in binary mode and pass as 'clip' parameter
+        # Clone the voice - this returns a complete voice object with ID
         with open(audio_clip_path, "rb") as audio_file:
-            embedding = cartesia_sync_client.voices.clone(
+            cloned_voice = cartesia_sync_client.voices.clone(
                 clip=audio_file,
                 name=voice_name,
                 language="en",
                 mode="similarity",  # Prioritize closeness to source voice
-                enhance=True  # Enable audio enhancement (cleaning and denoising)
+                enhance=True,  # Enable audio enhancement (cleaning and denoising)
+                description=f"Cloned professor voice from lecture"
             )
         
-        # The clone method returns the embedding directly in newer SDK versions
-        # Check if it's already a voice object with ID
-        if isinstance(embedding, dict) and "id" in embedding:
-            voice_id = embedding["id"]
-            print(f"✓ Voice cloned successfully! Voice ID: {voice_id}")
-            return voice_id
-        
-        # Otherwise, create a custom voice with the embedding
-        custom_voice = cartesia_sync_client.voices.create(
-            name=voice_name,
-            description=f"Cloned voice from lecture: {voice_name}",
-            embedding=embedding
-        )
-        
-        voice_id = custom_voice["id"]
+        # Extract voice ID from the returned voice object
+        voice_id = cloned_voice["id"]
         print(f"✓ Voice cloned successfully! Voice ID: {voice_id}")
         
         return voice_id
