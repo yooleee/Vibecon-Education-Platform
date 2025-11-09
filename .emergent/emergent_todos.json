@@ -1,14 +1,18 @@
 [
   {
-    "content": "Update voice_service.py to use sonic-3 model instead of sonic-english for multilingual support",
+    "content": "Fix V2 session to reinitialize when language changes in frontend",
     "status": "completed"
   },
   {
-    "content": "Test multilingual voice responses with Hindi and Spanish selections",
+    "content": "Add debug logging to track language parameter through the system",
     "status": "completed"
   },
   {
-    "content": "Verify English still works correctly with sonic-3 model",
+    "content": "Strengthen language instructions in prompts for better LLM compliance",
     "status": "completed"
+  },
+  {
+    "content": "Test the complete fix with Hindi and Spanish selections",
+    "status": "pending"
   }
 ]
