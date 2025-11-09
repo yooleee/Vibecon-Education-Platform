@@ -1,7 +1,7 @@
 [
   {
     "content": "Add frontend integration with v2 streaming endpoints",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Run comprehensive testing via testing_agent",
