@@ -9,11 +9,11 @@
   },
   {
     "content": "Add LiveKit integration to frontend",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test multilingual feature with all languages",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test LiveKit feature end-to-end",
