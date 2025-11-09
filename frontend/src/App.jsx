@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import './App.css';
 
 const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
 
-function App() {
+function AppContent() {
+  const { user, isAuthenticated, loginWithGoogle, logout } = useAuth();
   const [lectures, setLectures] = useState([]);
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,7 +26,7 @@ function App() {
 
   useEffect(() => {
     loadLectures();
-  }, []);
+  }, [isAuthenticated]);  // Reload when auth state changes
 
   const loadLectures = async () => {
     try {
@@ -63,9 +67,17 @@ function App() {
       }
     } catch (error) {
       console.error('Error deleting lecture:', error);
-      alert('Failed to delete lecture. Please try again.');
+      if (error.response?.status === 403) {
+        alert('You can only delete your own lectures. Demo lectures cannot be deleted.');
+      } else {
+        alert('Failed to delete lecture. Please try again.');
+      }
     }
   };
+
+  // Separate lectures into user's and demos
+  const myLectures = lectures.filter(l => !l.is_demo);
+  const demoLectures = lectures.filter(l => l.is_demo);
 
   return (
     <div className="app-container">
