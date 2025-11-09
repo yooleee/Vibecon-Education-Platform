@@ -163,7 +163,7 @@ async def get_lecture(lecture_id: str):
 
 @app.post("/api/query")
 async def query_lecture(request: QueryRequest):
-    """Ask a question about a lecture - Voice-first interaction"""
+    """Ask a question about a lecture - Voice-first interaction with cloned professor voice"""
     try:
         # Load lecture data
         lecture = load_lecture(request.lecture_id)
@@ -183,9 +183,12 @@ async def query_lecture(request: QueryRequest):
         # Generate answer using GPT-4o
         answer = await answer_query(request.question, relevant_chunks)
         
-        # VOICE-FIRST: Always generate audio response with Cartesia
+        # Use the CLONED VOICE for response!
         from services.voice_service import text_to_speech_cartesia
-        audio_path = await text_to_speech_cartesia(answer)
+        voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
+        print(f"🎙️ Using cloned professor voice: {voice_id}")
+        
+        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id)
         audio_filename = os.path.basename(audio_path)
         audio_url = f"/api/audio/{audio_filename}"
         
@@ -193,7 +196,8 @@ async def query_lecture(request: QueryRequest):
             "answer": answer,
             "relevant_chunks": relevant_chunks,
             "audio_url": audio_url,
-            "audio_path": audio_path
+            "audio_path": audio_path,
+            "using_cloned_voice": voice_id != "a0e99841-438c-4a64-b679-ae501e7d6091"
         }
     
     except Exception as e:
@@ -202,7 +206,7 @@ async def query_lecture(request: QueryRequest):
 
 @app.post("/api/voice-query")
 async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)):
-    """Voice-first query - upload audio question, get audio answer"""
+    """Voice-first query - upload audio question, get audio answer in professor's voice"""
     try:
         # Save uploaded audio
         audio_id = str(uuid.uuid4())
@@ -229,16 +233,20 @@ async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)
         # Generate answer
         answer = await answer_query(question_text, relevant_chunks)
         
-        # Generate voice response with Cartesia
+        # Generate voice response with CLONED PROFESSOR VOICE!
         from services.voice_service import text_to_speech_cartesia
-        audio_path = await text_to_speech_cartesia(answer)
+        voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
+        print(f"🎙️ Responding in professor's cloned voice: {voice_id}")
+        
+        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id)
         audio_filename = os.path.basename(audio_path)
         
         return {
             "question": question_text,
             "answer": answer,
             "audio_url": f"/api/audio/{audio_filename}",
-            "relevant_chunks": relevant_chunks
+            "relevant_chunks": relevant_chunks,
+            "using_cloned_voice": True
         }
     
     except Exception as e:
