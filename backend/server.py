@@ -66,6 +66,8 @@ app = FastAPI(title="EduVoice API")
 
 # Include V2 routes
 app.include_router(graph_router)
+# Include quiz routes
+app.include_router(quiz_router)
 
 # CORS configuration
 app.add_middleware(
