@@ -7,25 +7,36 @@ import uuid
 load_dotenv()
 
 
-async def answer_query(question: str, relevant_chunks: List[str]) -> str:
+async def answer_query(question: str, relevant_chunks: List[str], language: str = "en") -> str:
     """
     Generate an answer to a question using GPT-4o with relevant context
     
     Args:
         question: User's question
         relevant_chunks: Relevant transcript chunks
+        language: Response language (en, es, hi)
     
     Returns:
-        Generated answer
+        Generated answer in specified language
     """
     try:
         # Prepare context from relevant chunks
         context = "\n\n".join(relevant_chunks)
         
-        # Create system message
-        system_message = """You are an expert AI tutor helping students understand lecture content.
+        # Language-specific instructions
+        language_instructions = {
+            "en": "Respond in English.",
+            "es": "Responde en español. Provide entire answer in Spanish.",
+            "hi": "हिंदी में जवाब दें. Provide entire answer in Hindi."
+        }
+        
+        lang_instruction = language_instructions.get(language, language_instructions["en"])
+        
+        # Create system message with language instruction
+        system_message = f"""You are an expert AI tutor helping students understand lecture content.
 Use the provided lecture transcript excerpts to answer the student's question accurately and helpfully.
-If the answer is not in the provided context, say so and provide general guidance."""
+If the answer is not in the provided context, say so and provide general guidance.
+{lang_instruction}"""
         
         # Initialize LlmChat
         chat = LlmChat(
@@ -40,7 +51,7 @@ If the answer is not in the provided context, say so and provide general guidanc
 
 Student Question: {question}
 
-Provide a clear, concise answer based on the lecture content."""
+Provide a clear, concise answer based on the lecture content. {lang_instruction}"""
         
         user_message = UserMessage(text=user_prompt)
         
