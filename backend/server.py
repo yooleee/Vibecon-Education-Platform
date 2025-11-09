@@ -512,12 +512,26 @@ async def get_lecture(lecture_id: str):
 
 
 @app.delete("/api/lectures/{lecture_id}")
-async def delete_lecture_endpoint(lecture_id: str):
-    """Delete a lecture and all associated files"""
+async def delete_lecture_endpoint(lecture_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a lecture and all associated files (requires authentication and ownership)"""
     try:
+        # Load lecture to check ownership
+        lecture = load_lecture(lecture_id)
+        if not lecture:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        # Check if user owns the lecture (or if it's a demo they can't delete)
+        lecture_user_id = lecture.get("user_id")
+        if lecture_user_id is None:
+            raise HTTPException(status_code=403, detail="Cannot delete demo lectures")
+        
+        if lecture_user_id != current_user['google_id']:
+            raise HTTPException(status_code=403, detail="Not authorized to delete this lecture")
+        
+        # Delete the lecture
         success = delete_lecture(lecture_id)
         if not success:
-            raise HTTPException(status_code=404, detail="Lecture not found")
+            raise HTTPException(status_code=500, detail="Failed to delete lecture")
         
         return {"message": "Lecture deleted successfully", "lecture_id": lecture_id}
     except HTTPException:
