@@ -224,4 +224,4 @@
 - Frontend: Running on port 3000 with quiz UI integrated
 - Both services managed by supervisor with hot reload enabled
 
-**Preview URL**: https://voice-edu-quiz.preview.emergentagent.com
+**Preview URL**: https://smart-edu-chat.preview.emergentagent.com
