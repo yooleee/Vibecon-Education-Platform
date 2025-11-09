@@ -2,6 +2,7 @@
 Summary Service - Generate lecture summaries using AI
 """
 import os
+import re
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
@@ -11,6 +12,42 @@ load_dotenv()
 client = AsyncOpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
+
+
+def strip_markdown(text: str) -> str:
+    """
+    Remove markdown formatting for clean text-to-speech
+    
+    Args:
+        text: Text with markdown formatting
+    
+    Returns:
+        Plain text without markdown symbols
+    """
+    # Remove bold/italic markers
+    text = re.sub(r'\*\*\*(.+?)\*\*\*', r'\1', text)  # Bold + Italic
+    text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)      # Bold
+    text = re.sub(r'\*(.+?)\*', r'\1', text)          # Italic
+    text = re.sub(r'__(.+?)__', r'\1', text)          # Bold (underscore)
+    text = re.sub(r'_(.+?)_', r'\1', text)            # Italic (underscore)
+    
+    # Remove headers
+    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    
+    # Remove links but keep text
+    text = re.sub(r'\[(.+?)\]\(.+?\)', r'\1', text)
+    
+    # Remove code blocks
+    text = re.sub(r'`{3}.*?`{3}', '', text, flags=re.DOTALL)
+    text = re.sub(r'`(.+?)`', r'\1', text)
+    
+    # Remove horizontal rules
+    text = re.sub(r'^[-*_]{3,}$', '', text, flags=re.MULTILINE)
+    
+    # Clean up multiple newlines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    
+    return text.strip()
 
 
 async def generate_lecture_summary(transcript: str, lecture_title: str = "this lecture") -> dict:
@@ -26,34 +63,35 @@ async def generate_lecture_summary(transcript: str, lecture_title: str = "this l
     """
     try:
         # Calculate appropriate summary length based on transcript length
+        # Make summaries MUCH shorter - aim for 30-60 seconds of audio
         transcript_length = len(transcript)
         
         if transcript_length < 1000:
-            max_words = 150
+            max_words = 75  # ~30 seconds
             detail_level = "brief"
         elif transcript_length < 5000:
-            max_words = 300
+            max_words = 150  # ~60 seconds
             detail_level = "moderate"
         else:
-            max_words = 500
+            max_words = 200  # ~80 seconds max
             detail_level = "comprehensive"
         
         # Create the prompt for summary generation
-        prompt = f"""You are an educational AI assistant. Generate a clear and concise summary of the following lecture transcript.
+        prompt = f"""You are an educational AI assistant. Generate a CONCISE summary of the following lecture transcript.
 
 Lecture: {lecture_title}
 
 Your summary should:
-1. Capture the main topics and key concepts
-2. Highlight important points and takeaways
-3. Be well-structured with clear sections
-4. Use approximately {max_words} words
-5. Be suitable for students to quickly understand the lecture content
+1. Be VERY concise and to-the-point (approximately {max_words} words)
+2. Focus ONLY on the most important key points
+3. Be conversational and natural for text-to-speech
+4. Avoid repetition and filler words
+5. Use simple, clear language
 
 Transcript:
 {transcript}
 
-Please provide a {detail_level} summary that a student can use to review the main points of this lecture."""
+Please provide a brief summary that captures the essence of this lecture in approximately {max_words} words."""
 
         # Generate summary using GPT-4
         response = await client.chat.completions.create(
@@ -61,7 +99,7 @@ Please provide a {detail_level} summary that a student can use to review the mai
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert educational content summarizer. Create clear, concise, and informative summaries of academic lectures."
+                    "content": "You are an expert at creating ultra-concise, clear summaries of academic content. Keep summaries brief and conversational."
                 },
                 {
                     "role": "user",
@@ -76,6 +114,7 @@ Please provide a {detail_level} summary that a student can use to review the mai
         
         return {
             "summary": summary_text,
+            "summary_plain": strip_markdown(summary_text),  # Clean version for TTS
             "word_count": len(summary_text.split()),
             "transcript_length": transcript_length,
             "detail_level": detail_level
@@ -90,7 +129,7 @@ async def generate_summary_audio(summary_text: str, voice_id: str, language: str
     Convert summary text to speech using cloned professor voice
     
     Args:
-        summary_text: Summary text to convert
+        summary_text: Summary text to convert (should be plain text, no markdown)
         voice_id: Cartesia voice ID (cloned professor voice)
         language: Language code
     
@@ -100,9 +139,12 @@ async def generate_summary_audio(summary_text: str, voice_id: str, language: str
     try:
         from services.voice_service import text_to_speech_cartesia
         
-        # Generate audio using the cloned voice
+        # Strip any remaining markdown just to be safe
+        clean_text = strip_markdown(summary_text)
+        
+        # Generate audio using the cloned voice with CLEAN text
         audio_path = await text_to_speech_cartesia(
-            summary_text,
+            clean_text,
             voice_id=voice_id,
             language=language
         )
