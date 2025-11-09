@@ -81,7 +81,15 @@ function AppContent() {
 
   return (
     <div className="app-container">
-      <Header />
+      <Header 
+        user={user}
+        onLogin={loginWithGoogle}
+        onLogout={logout}
+        scrollToSection={scrollToSection}
+        uploadRef={uploadRef}
+        libraryRef={libraryRef}
+        lecturesCount={lectures.length}
+      />
       
       {/* Hero Section */}
       <section ref={heroRef} className="section-hero" data-testid="hero-section">
