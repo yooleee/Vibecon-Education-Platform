@@ -182,7 +182,7 @@ async def query_lecture(request: QueryRequest):
         relevant_chunks = [lecture["chunks"][i] for i in top_indices]
         
         # Generate answer using GPT-4o
-        answer = await answer_query(request.question, relevant_chunks)
+        answer = await answer_query(request.question, relevant_chunks, request.language)
         
         # Use the CLONED VOICE for response!
         from services.voice_service import text_to_speech_cartesia
