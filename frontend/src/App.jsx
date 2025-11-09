@@ -913,15 +913,6 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
           </div>
         )}
       </div>
-
-      <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)' }}>
-        <h3 className="mb-lg">Full Transcript</h3>
-        <div style={{ lineHeight: '1.8', color: 'var(--text-primary)' }} data-testid="transcript-viewer">
-          {lecture.transcript.split('\n').map((paragraph, index) => (
-            paragraph && <p key={index} className="mb-md">{paragraph}</p>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
