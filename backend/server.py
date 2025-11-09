@@ -204,6 +204,61 @@ async def query_lecture(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/voice-query-stream")
+async def voice_query_stream(lecture_id: str = Form(...), audio: UploadFile = File(...)):
+    """Streaming voice-first query - real-time response with progressive audio"""
+    try:
+        # Save uploaded audio
+        audio_id = str(uuid.uuid4())
+        audio_path = os.path.join(UPLOAD_DIR, f"question_{audio_id}.wav")
+        
+        with open(audio_path, "wb") as f:
+            content = await audio.read()
+            f.write(content)
+        
+        # Transcribe question
+        question_text = await transcribe_audio(audio_path)
+        
+        # Load lecture
+        lecture = load_lecture(lecture_id)
+        if not lecture:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        # Generate embedding and find relevant chunks
+        question_embedding = await generate_embeddings([question_text])
+        similarities = compute_similarity(question_embedding[0], lecture["embeddings"])
+        top_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)[:3]
+        relevant_chunks = [lecture["chunks"][i] for i in top_indices]
+        
+        # Get cloned voice ID
+        voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
+        
+        # Stream the response
+        from services.streaming_service import stream_voice_response
+        
+        async def event_generator():
+            """Generate SSE events"""
+            # Send question first
+            yield f"data: {json.dumps({'type': 'question', 'data': {'text': question_text}})}\n\n"
+            
+            # Stream AI response
+            async for event in stream_voice_response(question_text, relevant_chunks, voice_id):
+                yield f"data: {json.dumps(event)}\n\n"
+        
+        return StreamingResponse(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no"
+            }
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/voice-query")
 async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)):
     """Voice-first query - upload audio question, get audio answer in professor's voice"""
