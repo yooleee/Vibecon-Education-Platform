@@ -67,30 +67,47 @@ class SentenceBuffer:
 async def stream_voice_response(
     question: str,
     relevant_chunks: List[str],
-    cloned_voice_id: str
+    cloned_voice_id: str,
+    language: str = "en"
 ) -> AsyncGenerator[dict, None]:
     """
     Stream AI response with real-time TTS generation (OPTIMIZED)
+    
+    Args:
+        question: User's question
+        relevant_chunks: Relevant lecture content
+        cloned_voice_id: Cloned professor voice ID
+        language: Response language (en, es, hi)
     
     Yields:
         dict with 'type' (text/audio/complete) and 'data'
     """
     try:
-        print(f"\n🎙️ Starting OPTIMIZED streaming response with voice: {cloned_voice_id}")
+        print(f"\n🎙️ Starting OPTIMIZED streaming response with voice: {cloned_voice_id}, language: {language}")
         
         # Prepare context
         context = "\n\n".join(relevant_chunks)
         
-        system_message = """You are an expert AI tutor helping students understand lecture content.
+        # Language-specific instructions
+        language_instructions = {
+            "en": "Respond in English.",
+            "es": "Responde en español. Provide entire answer in Spanish.",
+            "hi": "हिंदी में जवाब दें. Provide entire answer in Hindi."
+        }
+        
+        lang_instruction = language_instructions.get(language, language_instructions["en"])
+        
+        system_message = f"""You are an expert AI tutor helping students understand lecture content.
 Use the provided lecture transcript excerpts to answer the student's question accurately and helpfully.
-Keep your answers clear, conversational, and well-paced for audio output."""
+Keep your answers clear, conversational, and well-paced for audio output.
+{lang_instruction}"""
         
         user_prompt = f"""Lecture Context:
 {context}
 
 Student Question: {question}
 
-Provide a clear, concise answer based on the lecture content."""
+Provide a clear, concise answer based on the lecture content. {lang_instruction}"""
         
         # Stream tokens from GPT-4o using OpenAI client
         sentence_buffer = SentenceBuffer()
