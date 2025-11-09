@@ -192,10 +192,6 @@ async def query_graph_stream(
                 # Send start event
                 yield f"data: {json.dumps({'type': 'start', 'data': {'message': 'AI is thinking...'}})}\n\n"
                 
-                # Stream through graph with text streaming
-                from langchain_openai import ChatOpenAI
-                from langchain_core.messages import SystemMessage, AIMessage
-                
                 # Run retrieve node first
                 print("🔍 Running retrieve node...")
                 retrieve_result = await retrieve_node(initial_state)
