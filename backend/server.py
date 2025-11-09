@@ -869,26 +869,22 @@ async def start_livekit_session(request: LiveKitSessionRequest, current_user: di
         if not all([livekit_url, livekit_api_key, livekit_api_secret]):
             raise HTTPException(status_code=500, detail="LiveKit credentials not configured")
         
-        # Create token with agent dispatch metadata
+        # Create token with proper grants
         token = livekit_api.AccessToken(livekit_api_key, livekit_api_secret)
-        token.identity = current_user['google_id']
-        token.name = current_user['name']
-        
-        # Add video grants with add_grant method
-        token.add_grant(livekit_api.VideoGrants(
+        token = token.with_identity(current_user['google_id'])
+        token = token.with_name(current_user['name'])
+        token = token.with_grants(livekit_api.VideoGrants(
             room_join=True,
             room=room_name,
             can_publish=True,
             can_subscribe=True,
             can_publish_data=True
         ))
-        
-        # Set attributes for agent dispatch
-        token.attributes = {
+        token = token.with_attributes({
             "lecture_id": request.lecture_id,
             "user_id": current_user['google_id'],
             "lecture_title": lecture.get("filename", "Unknown Lecture"),
-        }
+        })
         
         # Generate JWT token
         jwt_token = token.to_jwt()
