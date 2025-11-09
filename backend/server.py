@@ -38,6 +38,7 @@ class QueryRequest(BaseModel):
     lecture_id: str
     question: str
     mode: str = "text"  # "text" or "voice"
+    language: str = "en"  # Language for response (en, es, hi)
 
 
 class TTSRequest(BaseModel):
