@@ -3,7 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
-function Header({ user, onLogin, onLogout, scrollToSection, uploadRef, libraryRef, lecturesCount }) {
+function Header({ user, onLogin, onLogout, scrollToSection, uploadRef, libraryRef, quizHistoryRef, lecturesCount }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const googleLogin = useGoogleLogin({
