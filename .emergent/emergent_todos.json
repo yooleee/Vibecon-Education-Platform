@@ -1,11 +1,11 @@
 [
   {
     "content": "Analyze partner's new youtube_service.py and integrate into codebase",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Merge partner's server.py changes (YouTube/delete endpoints) with our V2 routes",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Merge partner's storage.py changes (delete functionality) with current version",
