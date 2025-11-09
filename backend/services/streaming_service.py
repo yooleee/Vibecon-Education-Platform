@@ -126,44 +126,28 @@ Provide a clear, concise answer based on the lecture content."""
                     token = delta.content
                     full_response += token
                     
-                    # Add to buffer and get complete sentences
-                    sentences = sentence_buffer.add(token)
+                    # Add to buffer and get complete phrases/sentences
+                    chunks_to_speak = sentence_buffer.add(token)
                     
-                    # Process each complete sentence
-                    for sentence in sentences:
-                        if sentence and len(sentence.strip()) > 3:
-                            print(f"📝 Complete sentence: '{sentence[:60]}...'")
+                    # Process each complete chunk (phrase or sentence)
+                    for text_chunk in chunks_to_speak:
+                        if text_chunk and len(text_chunk.strip()) > 3:
+                            print(f"📝 Chunk ready: '{text_chunk[:60]}...' ({len(text_chunk.split())} words)")
                             
                             # Send text immediately
                             yield {
                                 "type": "text",
-                                "data": {"text": sentence}
+                                "data": {"text": text_chunk}
                             }
                             
-                            # Generate and send audio URL (not base64!)
-                            try:
-                                print(f"🎙️ Generating TTS...")
-                                audio_path = await text_to_speech_cartesia(sentence, voice_id=cloned_voice_id)
-                                audio_filename = os.path.basename(audio_path)
-                                audio_url = f"/api/audio/{audio_filename}"
-                                print(f"✅ TTS generated: {audio_url}")
-                                
-                                # Send audio URL instead of base64 data
-                                print(f"📤 Sending audio URL")
-                                yield {
-                                    "type": "audio",
-                                    "data": {
-                                        "audio_url": audio_url,
-                                        "text": sentence
-                                    }
-                                }
-                                
-                                # Don't delete - let it be served via /api/audio endpoint
-                                
-                            except Exception as e:
-                                print(f"❌ TTS error: {e}")
-                                import traceback
-                                traceback.print_exc()
+                            # Generate TTS asynchronously (don't wait!)
+                            # This allows GPT-4o to continue streaming while TTS generates
+                            asyncio.create_task(
+                                generate_and_send_audio(text_chunk, cloned_voice_id)
+                            )
+                            
+                            # Small delay to ensure TTS starts before next chunk
+                            await asyncio.sleep(0.1)
         
         print("🏁 Stream complete, flushing buffer...")
         
