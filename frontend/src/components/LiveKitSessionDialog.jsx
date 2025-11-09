@@ -20,10 +20,12 @@ import {
 } from '@mui/icons-material';
 import { Room, RoomEvent, Track } from 'livekit-client';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
 
 function LiveKitSessionDialog({ open, onClose, lecture }) {
+  const { token, isAuthenticated } = useAuth();
   const [connectionState, setConnectionState] = useState('disconnected'); // disconnected, connecting, connected, error
   const [error, setError] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -34,7 +36,7 @@ function LiveKitSessionDialog({ open, onClose, lecture }) {
   const audioRef = useRef(null);
   
   useEffect(() => {
-    if (open && lecture) {
+    if (open && lecture && isAuthenticated) {
       startSession();
     }
     
@@ -44,15 +46,14 @@ function LiveKitSessionDialog({ open, onClose, lecture }) {
         roomRef.current = null;
       }
     };
-  }, [open, lecture]);
+  }, [open, lecture, isAuthenticated]);
   
   const startSession = async () => {
     try {
       setConnectionState('connecting');
       setError(null);
       
-      // Get auth token from localStorage
-      const token = localStorage.getItem('token');
+      // Check if user is authenticated
       if (!token) {
         throw new Error('Authentication required. Please log in.');
       }
