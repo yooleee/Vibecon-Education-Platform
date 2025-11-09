@@ -1,11 +1,7 @@
 [
   {
-    "content": "Test POC: Upload sample lecture and test v2 endpoints with conversation memory",
-    "status": "completed"
-  },
-  {
     "content": "Add frontend integration with v2 streaming endpoints",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Run comprehensive testing via testing_agent",
