@@ -79,6 +79,16 @@ function AppContent() {
     }
   };
 
+  const handleStartSession = (lecture) => {
+    setLivekitSelectedLecture(lecture);
+    setLivekitSessionOpen(true);
+  };
+
+  const handleCloseSession = () => {
+    setLivekitSessionOpen(false);
+    setLivekitSelectedLecture(null);
+  };
+
   // Separate lectures into user's and demos
   const myLectures = lectures.filter(l => !l.is_demo);
   const demoLectures = lectures.filter(l => l.is_demo);
