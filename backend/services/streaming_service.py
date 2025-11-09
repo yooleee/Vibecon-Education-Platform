@@ -2,13 +2,16 @@ import os
 import re
 import asyncio
 from typing import AsyncGenerator, List
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 from services.voice_service import text_to_speech_cartesia
 from dotenv import load_dotenv
 import uuid
 import base64
 
 load_dotenv()
+
+# Initialize OpenAI client for streaming
+openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class SentenceBuffer:
@@ -74,14 +77,7 @@ Student Question: {question}
 
 Provide a clear, concise answer based on the lecture content."""
         
-        # Initialize streaming chat
-        chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
-            session_id=str(uuid.uuid4()),
-            system_message=system_message
-        ).with_model("openai", "gpt-4o")
-        
-        # Stream tokens from GPT-4o
+        # Stream tokens from GPT-4o using OpenAI client
         sentence_buffer = SentenceBuffer()
         full_response = ""
         
@@ -91,12 +87,25 @@ Provide a clear, concise answer based on the lecture content."""
             "data": {"message": "AI is thinking..."}
         }
         
-        async for chunk in chat.stream_message(UserMessage(text=user_prompt)):
-            if chunk:
-                full_response += chunk
+        # Create streaming completion
+        stream = await openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=500,
+            stream=True
+        )
+        
+        async for chunk in stream:
+            if chunk.choices[0].delta.content:
+                token = chunk.choices[0].delta.content
+                full_response += token
                 
                 # Add to buffer and get complete sentences
-                sentences = sentence_buffer.add(chunk)
+                sentences = sentence_buffer.add(token)
                 
                 # Process each complete sentence
                 for sentence in sentences:
