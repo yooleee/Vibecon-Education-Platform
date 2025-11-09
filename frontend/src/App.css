@@ -1,6 +1,11 @@
+/* ============================================
+   APP LAYOUT - Notion-Inspired Education Theme
+   ============================================ */
+
 .app-container {
   min-height: 100vh;
   width: 100%;
+  background: var(--background-secondary);
 }
 
 /* Smooth scroll offset for fixed headers */
@@ -8,9 +13,13 @@ html {
   scroll-padding-top: 80px;
 }
 
-/* Custom scrollbar */
+/* ============================================
+   CUSTOM SCROLLBAR - Notion Style
+   ============================================ */
+
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -18,7 +27,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--glass-light-border);
+  background: var(--text-muted);
   border-radius: var(--radius-full);
 }
 
@@ -26,36 +35,206 @@ html {
   background: var(--text-tertiary);
 }
 
-/* Drag active state for upload */
-.drag-active {
-  transform: scale(1.02);
+/* ============================================
+   HEADER - Notion Style
+   ============================================ */
+
+.glass-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--surface-border);
+  padding: var(--space-lg) 0;
+  transition: all var(--transition-base);
 }
 
-/* Audio player styling */
+/* ============================================
+   HERO SECTION - Education Theme
+   ============================================ */
+
+.section-hero {
+  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.section-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.section-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ============================================
+   LECTURE CARDS - Modular Design
+   ============================================ */
+
+.lecture-card {
+  position: relative;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.lecture-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.lecture-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--edu-primary);
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.lecture-card:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   UPLOAD SECTION - Drag & Drop
+   ============================================ */
+
+.upload-dropzone {
+  border: 2px dashed var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl);
+  text-align: center;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.upload-dropzone:hover {
+  border-color: var(--edu-primary);
+  background: rgba(99, 102, 241, 0.02);
+}
+
+.drag-active {
+  transform: scale(1.02);
+  border-color: var(--edu-primary);
+  background: rgba(99, 102, 241, 0.05);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* ============================================
+   PROGRESS BARS & LOADERS
+   ============================================ */
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--background-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--edu-primary) 0%, var(--edu-secondary) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   AUDIO PLAYER - Modern Style
+   ============================================ */
+
 audio {
   width: 100%;
   height: 40px;
   outline: none;
-}
-
-audio::-webkit-media-controls-panel {
-  background: var(--glass-white);
   border-radius: var(--radius-md);
 }
 
-/* Message scrolling */
-.messages-container {
-  scroll-behavior: smooth;
+audio::-webkit-media-controls-panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
 }
 
-/* Focus visible improvements */
+/* ============================================
+   MESSAGE BUBBLES - Chat Style
+   ============================================ */
+
+.message-bubble {
+  position: relative;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  transition: all var(--transition-base);
+}
+
+.message.user .message-bubble {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.message.assistant .message-bubble {
+  background: var(--surface);
+  border-color: var(--surface-border);
+}
+
+/* ============================================
+   FOCUS STATES - Accessibility
+   ============================================ */
+
 .glass-input:focus-visible,
 .glass-button:focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--edu-primary);
   outline-offset: 2px;
 }
 
-/* Loading states */
+/* ============================================
+   LOADING STATES & ANIMATIONS
+   ============================================ */
+
 .loading-shimmer {
   background: linear-gradient(
     90deg,
@@ -79,19 +258,171 @@ audio::-webkit-media-controls-panel {
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
+    opacity: 1;
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    opacity: 0.8;
   }
 }
 
-/* Responsive adjustments */
+.pulse-animation {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   EMPTY STATES - Friendly & Welcoming
+   ============================================ */
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-2xl);
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-xl);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.empty-state p {
+  color: var(--text-tertiary);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   MODAL & OVERLAY
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+/* ============================================
+   EDUCATIONAL ICONS & DECORATIONS
+   ============================================ */
+
+.edu-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  font-size: 1.5rem;
+  border: 1px solid;
+}
+
+.edu-icon.book {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: var(--edu-book);
+}
+
+.edu-icon.lecture {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: var(--edu-lecture);
+}
+
+.edu-icon.quiz {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.2);
+  color: var(--edu-quiz);
+}
+
+/* ============================================
+   FEATURE CARDS - Notion-style
+   ============================================ */
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  transition: all var(--transition-base);
+}
+
+.feature-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--edu-primary);
+  transform: translateY(-2px);
+}
+
+.feature-card-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--edu-primary) 0%, var(--edu-secondary) 100%);
+  color: white;
+  font-size: 1.75rem;
+  margin-bottom: var(--space-lg);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
 @media (max-width: 768px) {
   .section {
     padding: var(--space-3xl) 0;
   }
   
   .section-hero {
-    min-height: 80vh;
+    min-height: calc(100vh - 64px);
+    padding: var(--space-3xl) 0;
+  }
+
+  .glass-card {
+    padding: var(--space-xl);
+  }
+
+  .feature-card {
+    padding: var(--space-xl);
+  }
+
+  .empty-state {
+    padding: var(--space-3xl) var(--space-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-dropzone {
+    padding: var(--space-2xl);
+  }
+
+  .feature-card-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
   }
 }
