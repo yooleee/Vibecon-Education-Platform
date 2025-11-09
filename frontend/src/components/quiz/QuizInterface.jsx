@@ -179,38 +179,58 @@ function QuizInterface({ sessionId, lectureId, voiceMode, onClose, onComplete })
 
       {!feedback && (
         <div>
-          {currentQuestion.question_type === 'open_ended' && voiceMode ? (
-            <QuizVoiceInput
-              onSubmit={submitVoiceAnswer}
-              disabled={loading}
-            />
-          ) : currentQuestion.question_type === 'open_ended' ? (
+          {voiceMode ? (
+            // Voice mode for all question types
             <div>
-              <textarea
-                className="glass-input"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder="Type your answer here..."
-                rows="4"
+              <QuizVoiceInput
+                onSubmit={submitVoiceAnswer}
                 disabled={loading}
-                data-testid="text-answer-input"
-                style={{ width: '100%', marginBottom: 'var(--space-md)', fontFamily: 'inherit' }}
               />
-              <button
-                className="glass-button-primary glass-button"
-                onClick={() => submitAnswer(userAnswer)}
-                disabled={loading || !userAnswer.trim()}
-                data-testid="submit-answer-button"
-              >
-                Submit Answer
-              </button>
+              
+              {/* Show answer options below for reference (MCQ/True-False) */}
+              {currentQuestion.question_type !== 'open_ended' && (
+                <div style={{ marginTop: 'var(--space-lg)' }}>
+                  <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>
+                    Or click an option below:
+                  </p>
+                  <QuizAnswerOptions
+                    options={currentQuestion.options}
+                    onSelect={(answer) => submitAnswer(answer)}
+                    disabled={loading}
+                  />
+                </div>
+              )}
             </div>
           ) : (
-            <QuizAnswerOptions
-              options={currentQuestion.options}
-              onSelect={(answer) => submitAnswer(answer)}
-              disabled={loading}
-            />
+            // Text mode
+            currentQuestion.question_type === 'open_ended' ? (
+              <div>
+                <textarea
+                  className="glass-input"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Type your answer here..."
+                  rows="4"
+                  disabled={loading}
+                  data-testid="text-answer-input"
+                  style={{ width: '100%', marginBottom: 'var(--space-md)', fontFamily: 'inherit' }}
+                />
+                <button
+                  className="glass-button-primary glass-button"
+                  onClick={() => submitAnswer(userAnswer)}
+                  disabled={loading || !userAnswer.trim()}
+                  data-testid="submit-answer-button"
+                >
+                  Submit Answer
+                </button>
+              </div>
+            ) : (
+              <QuizAnswerOptions
+                options={currentQuestion.options}
+                onSelect={(answer) => submitAnswer(answer)}
+                disabled={loading}
+              />
+            )
           )}
         </div>
       )}
