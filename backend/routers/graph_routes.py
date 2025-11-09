@@ -186,6 +186,10 @@ async def query_graph_stream(
         async def event_generator():
             """Generate SSE events"""
             try:
+                # DEBUG: Log the language being used
+                print(f"🌍 SESSION LANGUAGE: {session.language}")
+                print(f"🌍 INITIAL STATE LANGUAGE: {initial_state.get('language')}")
+                
                 # Send question
                 yield f"data: {json.dumps({'type': 'question', 'data': {'text': question_text}})}\n\n"
                 
@@ -203,11 +207,12 @@ async def query_graph_stream(
                 # Language instructions
                 language_instructions = {
                     "en": "Respond in English.",
-                    "es": "Responde en español. Provide entire answer in Spanish.",
-                    "hi": "हिंदी में जवाब दें. Provide entire answer in Hindi."
+                    "es": "Responde COMPLETAMENTE en español. TODA tu respuesta debe estar en español.",
+                    "hi": "हिंदी में पूरा जवाब दें। Your ENTIRE response must be in Hindi."
                 }
                 
                 lang_instruction = language_instructions.get(session.language, language_instructions["en"])
+                print(f"🌍 USING LANGUAGE INSTRUCTION: {lang_instruction}")
                 
                 # Build system message
                 system_content = f"""You are an expert AI tutor helping students understand lecture content.
