@@ -136,6 +136,15 @@ function LectureList({ lectures, loading, onSelectLecture, onRefresh }) {
           ))}
         </Grid>
       )}
+      
+      {/* LiveKit Session Dialog */}
+      {selectedLecture && (
+        <LiveKitSessionDialog
+          open={livekitSessionOpen}
+          onClose={handleCloseSession}
+          lecture={selectedLecture}
+        />
+      )}
     </Box>
   );
 }
