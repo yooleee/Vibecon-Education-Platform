@@ -71,11 +71,11 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
         # Generate speech with Cartesia using bytes method
         audio_data = b""
         async for chunk in cartesia_client.tts.bytes(
-            model_id="sonic-english",
+            model_id="sonic-3",
             transcript=text,
             voice={"id": voice_id},  # Use cloned voice or default
             output_format=output_format,
-            language=language  # Dynamic language support
+            language=language  # Dynamic language support (en, es, hi)
         ):
             audio_data += chunk
         
