@@ -159,5 +159,6 @@ watchfiles==1.1.1
 websockets==13.0
 xxhash==3.6.0
 yarl==1.22.0
+yt-dlp==2025.10.22
 zipp==3.23.0
 zstandard==0.25.0
