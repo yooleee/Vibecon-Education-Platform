@@ -1,34 +1,18 @@
 [
   {
-    "content": "Merge partner's storage.py changes (delete functionality) with current version",
+    "content": "Update requirements.txt to include yt-dlp dependency",
     "status": "completed"
-  },
-  {
-    "content": "Merge partner's transcription_service.py updates",
-    "status": "completed"
-  },
-  {
-    "content": "Merge partner's LectureList.jsx (delete button) with current version",
-    "status": "pending"
-  },
-  {
-    "content": "Merge partner's App.jsx UI upgrades with our VoiceTutorInterfaceV2 integration",
-    "status": "pending"
   },
   {
     "content": "Merge partner's CSS files (App.css, index.css) for UI improvements",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Merge partner's LectureViewer.jsx updates",
-    "status": "pending"
+    "content": "Merge partner's App.jsx UI upgrades with our VoiceTutorInterfaceV2 integration",
+    "status": "completed"
   },
   {
-    "content": "Update requirements.txt to include yt-dlp dependency",
+    "content": "Restart services and test merged application",
     "status": "in_progress"
-  },
-  {
-    "content": "Test merged application end-to-end",
-    "status": "pending"
   }
 ]
