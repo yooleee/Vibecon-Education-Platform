@@ -762,7 +762,7 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
 }
 
 // Lecture Card Component
-function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
+function LectureCard({ lecture, index, onSelect, onDelete, canDelete, onStartSession }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -801,7 +801,7 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
       </div>
       <button
         className="glass-button-primary glass-button"
-        style={{ width: '100%', justifyContent: 'center' }}
+        style={{ width: '100%', justifyContent: 'center', marginBottom: '8px' }}
         onClick={() => onSelect(lecture)}
         data-testid={`open-lecture-${lecture.id}`}
       >
@@ -809,6 +809,22 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
           <path d="M8 5v14l11-7z" />
         </svg>
         Open AI Tutor
+      </button>
+      <button
+        className="glass-button"
+        style={{ 
+          width: '100%', 
+          justifyContent: 'center',
+          borderColor: '#007AFF',
+          color: '#007AFF'
+        }}
+        onClick={() => onStartSession(lecture)}
+        data-testid={`start-session-${lecture.id}`}
+      >
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        </svg>
+        Start Session
       </button>
     </motion.div>
   );
