@@ -40,9 +40,12 @@ def load_lecture(lecture_id: str) -> Optional[Dict]:
         return json.load(f)
 
 
-def list_lectures() -> List[Dict]:
+def list_lectures(user_id: Optional[str] = None) -> List[Dict]:
     """
-    List all lectures with basic information
+    List lectures - either all (for demos) or filtered by user
+    
+    Args:
+        user_id: Optional user ID to filter lectures
     
     Returns:
         List of lecture summaries
@@ -58,13 +61,21 @@ def list_lectures() -> List[Dict]:
             lecture = load_lecture(lecture_id)
             
             if lecture:
-                # Return only summary info (not full transcript/embeddings)
-                lectures.append({
-                    "id": lecture["id"],
-                    "filename": lecture["filename"],
-                    "upload_date": lecture["upload_date"],
-                    "chunks_count": len(lecture.get("chunks", []))
-                })
+                lecture_user_id = lecture.get("user_id")
+                
+                # Include if:
+                # 1. No user_id specified (show all)
+                # 2. Lecture is a demo (user_id is None)
+                # 3. Lecture belongs to the user
+                if user_id is None or lecture_user_id is None or lecture_user_id == user_id:
+                    # Return only summary info (not full transcript/embeddings)
+                    lectures.append({
+                        "id": lecture["id"],
+                        "filename": lecture["filename"],
+                        "upload_date": lecture["upload_date"],
+                        "chunks_count": len(lecture.get("chunks", [])),
+                        "is_demo": lecture_user_id is None
+                    })
     
     # Sort by upload date (newest first)
     lectures.sort(key=lambda x: x["upload_date"], reverse=True)
