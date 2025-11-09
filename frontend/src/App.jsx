@@ -452,6 +452,28 @@ function AppContent() {
         </>
       )}
 
+      {/* Quiz History Section */}
+      {isAuthenticated && (
+        <section ref={quizHistoryRef} className="section" style={{ background: 'var(--surface)' }} data-testid="quiz-history-section">
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="text-center mb-3xl">
+                <h2 className="mb-md">Quiz History</h2>
+                <p className="text-secondary" style={{ fontSize: '1rem', maxWidth: '600px', margin: '0 auto' }}>
+                  Track your learning progress and review past quiz results
+                </p>
+              </div>
+              <QuizHistorySection backendUrl={BACKEND_URL} />
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer style={{ background: 'var(--background-dark)', padding: 'var(--space-3xl) 0', textAlign: 'center', borderTop: '1px solid var(--surface-border)' }}>
         <div className="container">
