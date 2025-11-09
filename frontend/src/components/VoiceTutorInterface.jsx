@@ -118,6 +118,7 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'question.webm');
       formData.append('lecture_id', lectureId);
+      formData.append('language', selectedLanguage); // Include selected language
 
       const response = await axios.post(
         `${backendUrl}/api/voice-query`,
@@ -143,6 +144,7 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
         audio_url: response.data.audio_url,
         relevant_chunks: response.data.relevant_chunks,
         timestamp: new Date().toISOString(),
+        language: response.data.language,
       };
 
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
