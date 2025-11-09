@@ -540,6 +540,9 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
   const [lecture, setLecture] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
 
   useEffect(() => {
     loadLecture();
@@ -556,6 +559,21 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    try {
+      setSummaryLoading(true);
+      setSummaryError(null);
+      
+      const response = await axios.post(`${backendUrl}/api/lectures/${lectureId}/summary`);
+      setSummary(response.data);
+    } catch (err) {
+      setSummaryError('Failed to generate summary. Please try again.');
+      console.error('Summary error:', err);
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
@@ -608,8 +626,76 @@ function LectureViewer({ lectureId, backendUrl, onDelete, onBack }) {
         </div>
       </div>
 
+      {/* Summary Section */}
+      <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)', marginBottom: 'var(--space-xl)' }}>
+        <div className="flex justify-between items-center mb-lg">
+          <h3>Lecture Summary</h3>
+          {!summary && (
+            <button
+              className="glass-button-primary glass-button"
+              onClick={handleGenerateSummary}
+              disabled={summaryLoading}
+              data-testid="generate-summary-button"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {summaryLoading ? 'Generating...' : 'Generate Summary'}
+            </button>
+          )}
+        </div>
+
+        {summaryLoading && (
+          <div className="flex items-center gap-md mb-lg">
+            <div className="spinner" style={{ width: '24px', height: '24px' }}></div>
+            <p className="text-secondary">Generating summary with AI... This may take up to a minute.</p>
+          </div>
+        )}
+
+        {summaryError && (
+          <div className="glass-card mb-lg" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.3)' }}>
+            <p style={{ color: 'var(--accent-error)', margin: 0 }}>{summaryError}</p>
+          </div>
+        )}
+
+        {summary && (
+          <div className="glass-card" style={{ background: 'var(--background-secondary)' }}>
+            <p style={{ lineHeight: '1.8', marginBottom: 'var(--space-lg)' }}>
+              {summary.summary}
+            </p>
+            
+            <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-lg)' }}>
+              <div className="flex justify-between items-center" style={{ flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+                <p className="text-secondary text-sm">
+                  {summary.word_count} words • {summary.cached ? 'Cached' : 'Freshly generated'}
+                </p>
+                
+                <audio 
+                  controls 
+                  src={`${backendUrl}${summary.audio_url}`}
+                  style={{ maxWidth: '100%', height: '40px' }}
+                  data-testid="summary-audio-player"
+                >
+                  <source src={`${backendUrl}${summary.audio_url}`} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+              
+              <div className="flex items-center gap-sm mt-md">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
+                  <path d="M11.983 1.907a.75.75 0 00-1.388-.341l-3.868 8.873-4.494.65a.75.75 0 00-.415 1.279l3.25 3.169-.768 4.478a.75.75 0 001.088.79L12 17.347l4.612 2.458a.75.75 0 001.088-.79l-.768-4.478 3.25-3.169a.75.75 0 00-.415-1.279l-4.494-.65-3.868-8.873a.75.75 0 00-.422-.35z" />
+                </svg>
+                <p className="text-sm" style={{ color: 'var(--accent-primary)' }}>
+                  Listen to the summary in the professor's voice
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-xl)' }}>
-        <h3 className="mb-lg">Transcript</h3>
+        <h3 className="mb-lg">Full Transcript</h3>
         <div style={{ lineHeight: '1.8', color: 'var(--text-primary)' }} data-testid="transcript-viewer">
           {lecture.transcript.split('\n').map((paragraph, index) => (
             paragraph && <p key={index} className="mb-md">{paragraph}</p>
