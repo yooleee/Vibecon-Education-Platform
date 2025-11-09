@@ -142,6 +142,89 @@ async def upload_lecture(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/upload-youtube")
+async def upload_youtube_lecture(request: YouTubeRequest):
+    """Process a YouTube video as a lecture with voice cloning"""
+    try:
+        # Validate YouTube URL
+        if not validate_youtube_url(request.youtube_url):
+            raise HTTPException(status_code=400, detail="Invalid YouTube URL")
+        
+        # Generate unique ID
+        lecture_id = str(uuid.uuid4())
+        
+        print(f"\n🎬 Processing YouTube video: {request.youtube_url}")
+        
+        # Download audio from YouTube
+        audio_path, video_title = download_youtube_audio(request.youtube_url, UPLOAD_DIR)
+        
+        # Use video title as filename (sanitized)
+        filename = f"{video_title}.mp4"
+        
+        # STEP 1: Extract best voice clip for cloning
+        print(f"\n🎤 Analyzing audio to find best voice sample...")
+        from services.audio_analysis_service import extract_best_voice_clip
+        voice_clip_path, clip_quality = extract_best_voice_clip(
+            audio_path, 
+            clip_duration=8.0,
+            num_candidates=10
+        )
+        
+        # STEP 2: Clone the voice
+        print(f"\n🔬 Cloning voice...")
+        from services.voice_service import clone_voice_from_audio
+        cloned_voice_id = await clone_voice_from_audio(
+            voice_clip_path,
+            voice_name=f"YouTube {lecture_id[:8]}"
+        )
+        
+        # Transcribe audio
+        print(f"\n📝 Transcribing audio...")
+        transcript = await transcribe_audio(audio_path)
+        
+        # Chunk transcript
+        chunks = chunk_text(transcript)
+        
+        # Generate embeddings
+        print(f"\n🧠 Generating embeddings...")
+        embeddings = await generate_embeddings(chunks)
+        
+        # Save lecture data
+        lecture_data = {
+            "id": lecture_id,
+            "filename": filename,
+            "upload_date": datetime.now().isoformat(),
+            "transcript": transcript,
+            "chunks": chunks,
+            "embeddings": embeddings,
+            "video_path": None,  # No video file for YouTube
+            "audio_path": audio_path,
+            "cloned_voice_id": cloned_voice_id,
+            "voice_clip_path": voice_clip_path,
+            "voice_clip_quality": clip_quality,
+            "source": "youtube",
+            "youtube_url": request.youtube_url
+        }
+        
+        save_lecture(lecture_id, lecture_data)
+        
+        print(f"\n✅ YouTube lecture processed successfully!")
+        
+        return {
+            "lecture_id": lecture_id,
+            "filename": filename,
+            "status": "processed",
+            "chunks_count": len(chunks),
+            "cloned_voice_id": cloned_voice_id,
+            "voice_cloning_quality": clip_quality["quality_score"],
+            "source": "youtube"
+        }
+    
+    except Exception as e:
+        print(f"❌ YouTube processing error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/lectures")
 async def get_lectures():
     """List all uploaded lectures"""
