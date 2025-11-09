@@ -238,23 +238,40 @@ async def upload_lecture(file: UploadFile = File(...)):
 @app.post("/api/upload-youtube")
 async def upload_youtube_lecture(request: YouTubeRequest):
     """Process a YouTube video as a lecture with voice cloning"""
+    lecture_id = str(uuid.uuid4())
+    
     try:
+        # Initialize progress tracking
+        upload_progress[lecture_id] = {
+            "status": "processing",
+            "stage": "validating",
+            "progress": 0,
+            "message": "Validating YouTube URL..."
+        }
+        
         # Validate YouTube URL
         if not validate_youtube_url(request.youtube_url):
             raise HTTPException(status_code=400, detail="Invalid YouTube URL")
         
-        # Generate unique ID
-        lecture_id = str(uuid.uuid4())
-        
         print(f"\n🎬 Processing YouTube video: {request.youtube_url}")
         
         # Download audio from YouTube
+        upload_progress[lecture_id].update({
+            "stage": "downloading",
+            "progress": 15,
+            "message": "Downloading YouTube audio..."
+        })
         audio_path, video_title = download_youtube_audio(request.youtube_url, UPLOAD_DIR)
         
         # Use video title as filename (sanitized)
         filename = f"{video_title}.mp4"
         
         # STEP 1: Extract best voice clip for cloning
+        upload_progress[lecture_id].update({
+            "stage": "analyzing",
+            "progress": 30,
+            "message": "Analyzing audio quality..."
+        })
         print(f"\n🎤 Analyzing audio to find best voice sample...")
         from services.audio_analysis_service import extract_best_voice_clip
         voice_clip_path, clip_quality = extract_best_voice_clip(
@@ -264,8 +281,12 @@ async def upload_youtube_lecture(request: YouTubeRequest):
         )
         
         # STEP 2 & 3: Run voice cloning and transcription IN PARALLEL
+        upload_progress[lecture_id].update({
+            "stage": "parallel_processing",
+            "progress": 45,
+            "message": "Cloning voice and transcribing (parallel)..."
+        })
         print(f"\n⚡ Starting parallel processing (voice cloning + transcription)...")
-        import asyncio
         from services.voice_service import clone_voice_from_audio
         
         # Run both tasks concurrently for faster processing
@@ -280,13 +301,28 @@ async def upload_youtube_lecture(request: YouTubeRequest):
         print(f"✅ Parallel processing complete!")
         
         # Chunk transcript
+        upload_progress[lecture_id].update({
+            "stage": "chunking",
+            "progress": 70,
+            "message": "Processing transcript..."
+        })
         chunks = chunk_text(transcript)
         
         # Generate embeddings
+        upload_progress[lecture_id].update({
+            "stage": "embeddings",
+            "progress": 80,
+            "message": "Generating embeddings..."
+        })
         print(f"\n🧠 Generating embeddings...")
         embeddings = await generate_embeddings(chunks)
         
         # Save lecture data
+        upload_progress[lecture_id].update({
+            "stage": "saving",
+            "progress": 95,
+            "message": "Finalizing..."
+        })
         lecture_data = {
             "id": lecture_id,
             "filename": filename,
@@ -305,6 +341,22 @@ async def upload_youtube_lecture(request: YouTubeRequest):
         
         save_lecture(lecture_id, lecture_data)
         
+        # Mark as completed
+        upload_progress[lecture_id].update({
+            "status": "completed",
+            "stage": "completed",
+            "progress": 100,
+            "message": "YouTube lecture processed successfully!",
+            "result": {
+                "lecture_id": lecture_id,
+                "filename": filename,
+                "chunks_count": len(chunks),
+                "cloned_voice_id": cloned_voice_id,
+                "voice_cloning_quality": clip_quality["quality_score"],
+                "source": "youtube"
+            }
+        })
+        
         print(f"\n✅ YouTube lecture processed successfully!")
         
         return {
@@ -319,6 +371,12 @@ async def upload_youtube_lecture(request: YouTubeRequest):
     
     except Exception as e:
         print(f"❌ YouTube processing error: {str(e)}")
+        # Mark as error
+        if lecture_id in upload_progress:
+            upload_progress[lecture_id].update({
+                "status": "error",
+                "message": str(e)
+            })
         raise HTTPException(status_code=500, detail=str(e))
 
 
