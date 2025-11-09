@@ -152,8 +152,8 @@ async def get_upload_progress(lecture_id: str):
 
 
 @app.post("/api/upload")
-async def upload_lecture(file: UploadFile = File(...)):
-    """Upload and process a lecture video with voice cloning"""
+async def upload_lecture(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    """Upload and process a lecture video with voice cloning (requires authentication)"""
     lecture_id = str(uuid.uuid4())
     
     try:
