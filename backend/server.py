@@ -874,23 +874,21 @@ async def start_livekit_session(request: LiveKitSessionRequest, current_user: di
         token.identity = current_user['google_id']
         token.name = current_user['name']
         
-        # Add video grants
-        token.grants = livekit_api.VideoGrants(
+        # Add video grants with add_grant method
+        token.add_grant(livekit_api.VideoGrants(
             room_join=True,
             room=room_name,
             can_publish=True,
             can_subscribe=True,
             can_publish_data=True
-        )
+        ))
         
-        # Set attributes for agent dispatch (not metadata)
-        agent_attributes = {
+        # Set attributes for agent dispatch
+        token.attributes = {
             "lecture_id": request.lecture_id,
             "user_id": current_user['google_id'],
             "lecture_title": lecture.get("filename", "Unknown Lecture"),
         }
-        
-        token.attributes = agent_attributes
         
         # Generate JWT token
         jwt_token = token.to_jwt()
