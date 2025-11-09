@@ -264,7 +264,7 @@ function App() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <h2 className="text-center mb-2xl">AI Tutor</h2>
-                <VoiceTutorInterface
+                <VoiceTutorInterfaceV2
                   lectureId={selectedLecture.id}
                   backendUrl={BACKEND_URL}
                 />
