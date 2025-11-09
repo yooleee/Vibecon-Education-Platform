@@ -45,13 +45,14 @@ async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
         raise Exception(f"Voice cloning failed: {str(e)}")
 
 
-async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64-b679-ae501e7d6091") -> str:
+async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64-b679-ae501e7d6091", language: str = "en") -> str:
     """
     Convert text to speech using Cartesia Sonic 3 for ultra-low latency
     
     Args:
         text: Text to convert to speech
         voice_id: Cartesia voice ID (default is Barbershop Man, or use cloned voice ID)
+        language: Language code - "en" (English), "es" (Spanish), "hi" (Hindi)
     
     Returns:
         Path to generated audio file
@@ -74,7 +75,7 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
             transcript=text,
             voice={"id": voice_id},  # Use cloned voice or default
             output_format=output_format,
-            language="en"
+            language=language  # Support en, es, hi
         ):
             audio_data += chunk
         
@@ -82,6 +83,7 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
         with open(output_path, "wb") as f:
             f.write(audio_data)
         
+        print(f"✓ Generated speech in language: {language}")
         return output_path
     
     except Exception as e:
