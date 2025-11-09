@@ -423,6 +423,7 @@ async def upload_youtube_lecture(request: YouTubeRequest, current_user: dict = D
         })
         lecture_data = {
             "id": lecture_id,
+            "user_id": current_user['google_id'],  # Link to user
             "filename": filename,
             "upload_date": datetime.now().isoformat(),
             "transcript": transcript,
