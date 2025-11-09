@@ -21,11 +21,11 @@
   },
   {
     "content": "Add Start Session button to LectureList component",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create SessionDialog component for LiveKit room connection",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test POC: manual test of token generation, agent greeting, basic conversation",
