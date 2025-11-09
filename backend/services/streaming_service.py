@@ -70,21 +70,20 @@ async def stream_voice_response(
     cloned_voice_id: str
 ) -> AsyncGenerator[dict, None]:
     """
-    Stream AI response with real-time TTS generation
+    Stream AI response with real-time TTS generation (OPTIMIZED)
     
     Yields:
         dict with 'type' (text/audio/complete) and 'data'
     """
     try:
-        print(f"\n🎙️ Starting streaming response with voice: {cloned_voice_id}")
+        print(f"\n🎙️ Starting OPTIMIZED streaming response with voice: {cloned_voice_id}")
         
         # Prepare context
         context = "\n\n".join(relevant_chunks)
         
         system_message = """You are an expert AI tutor helping students understand lecture content.
 Use the provided lecture transcript excerpts to answer the student's question accurately and helpfully.
-If the answer is not in the provided context, say so and provide general guidance.
-Keep your answers clear and conversational."""
+Keep your answers clear, conversational, and well-paced for audio output."""
         
         user_prompt = f"""Lecture Context:
 {context}
@@ -132,7 +131,8 @@ Provide a clear, concise answer based on the lecture content."""
                     # Process each complete chunk (phrase or sentence)
                     for text_chunk in chunks_to_speak:
                         if text_chunk and len(text_chunk.strip()) > 3:
-                            print(f"📝 Chunk ready: '{text_chunk[:60]}...' ({len(text_chunk.split())} words)")
+                            word_count = len(text_chunk.split())
+                            print(f"📝 Chunk ready ({word_count} words): '{text_chunk[:60]}...'")
                             
                             # Send text immediately
                             yield {
@@ -140,14 +140,27 @@ Provide a clear, concise answer based on the lecture content."""
                                 "data": {"text": text_chunk}
                             }
                             
-                            # Generate TTS asynchronously (don't wait!)
-                            # This allows GPT-4o to continue streaming while TTS generates
-                            asyncio.create_task(
-                                generate_and_send_audio(text_chunk, cloned_voice_id)
-                            )
-                            
-                            # Small delay to ensure TTS starts before next chunk
-                            await asyncio.sleep(0.1)
+                            # Generate and send audio URL
+                            try:
+                                print(f"🎙️ Generating TTS for {word_count} words...")
+                                audio_path = await text_to_speech_cartesia(text_chunk, voice_id=cloned_voice_id)
+                                audio_filename = os.path.basename(audio_path)
+                                audio_url = f"/api/audio/{audio_filename}"
+                                print(f"✅ TTS ready: {audio_url}")
+                                
+                                # Send audio URL
+                                yield {
+                                    "type": "audio",
+                                    "data": {
+                                        "audio_url": audio_url,
+                                        "text": text_chunk
+                                    }
+                                }
+                                
+                            except Exception as e:
+                                print(f"❌ TTS error: {e}")
+                                import traceback
+                                traceback.print_exc()
         
         print("🏁 Stream complete, flushing buffer...")
         
