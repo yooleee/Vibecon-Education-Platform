@@ -6,7 +6,8 @@ load_dotenv()
 
 # Initialize OpenAI client with Emergent LLM key for Whisper transcription
 client = AsyncOpenAI(
-    api_key=os.getenv("EMERGENT_LLM_KEY")
+    api_key=os.getenv("EMERGENT_LLM_KEY"),
+    base_url="https://api.emergentagi.com/v1"
 )
 
 
