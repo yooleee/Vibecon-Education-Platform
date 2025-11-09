@@ -1,12 +1,46 @@
 import os
 import uuid
-from cartesia import AsyncCartesia
+from cartesia import AsyncCartesia, Cartesia
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize Cartesia client
+# Initialize Cartesia client (both async and sync)
 cartesia_client = AsyncCartesia(api_key=os.getenv("CARTESIA_API_KEY"))
+cartesia_sync_client = Cartesia(api_key=os.getenv("CARTESIA_API_KEY"))
+
+
+async def clone_voice_from_audio(audio_clip_path: str, voice_name: str) -> str:
+    """
+    Clone a voice from an audio clip using Cartesia
+    
+    Args:
+        audio_clip_path: Path to 5-10 second audio clip
+        voice_name: Name for the cloned voice
+    
+    Returns:
+        Voice ID of the cloned voice
+    """
+    try:
+        print(f"Cloning voice from: {audio_clip_path}")
+        
+        # Clone the voice (synchronous operation)
+        embedding = cartesia_sync_client.voices.clone(filepath=audio_clip_path)
+        
+        # Create a custom voice with the embedding
+        custom_voice = cartesia_sync_client.voices.create(
+            name=voice_name,
+            description=f"Cloned voice from lecture: {voice_name}",
+            embedding=embedding
+        )
+        
+        voice_id = custom_voice["id"]
+        print(f"✓ Voice cloned successfully! Voice ID: {voice_id}")
+        
+        return voice_id
+    
+    except Exception as e:
+        raise Exception(f"Voice cloning failed: {str(e)}")
 
 
 async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64-b679-ae501e7d6091") -> str:
@@ -15,17 +49,12 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
     
     Args:
         text: Text to convert to speech
-        voice_id: Cartesia voice ID (default is Barbershop Man - friendly, clear)
+        voice_id: Cartesia voice ID (default is Barbershop Man, or use cloned voice ID)
     
     Returns:
         Path to generated audio file
     """
     try:
-        # Available voices for education:
-        # "a0e99841-438c-4a64-b679-ae501e7d6091" - Barbershop Man (friendly, clear)
-        # "79a125e8-cd45-4c13-8a67-188112f4dd22" - British Lady (professional)
-        # "156fb8d2-335b-4950-9cb3-a2d33befec77" - Newsman (authoritative)
-        
         audio_id = str(uuid.uuid4())
         output_path = f"/app/data/uploads/voice_{audio_id}.mp3"
         
@@ -41,7 +70,7 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
         async for chunk in cartesia_client.tts.bytes(
             model_id="sonic-english",
             transcript=text,
-            voice={"id": voice_id},  # Pass as dictionary with 'id' key
+            voice={"id": voice_id},  # Use cloned voice or default
             output_format=output_format,
             language="en"
         ):
