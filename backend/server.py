@@ -650,6 +650,79 @@ async def get_audio(audio_filename: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/lectures/{lecture_id}/summary")
+async def generate_summary(lecture_id: str):
+    """Generate a summary of the lecture with audio in professor's voice"""
+    try:
+        # Load lecture
+        lecture = load_lecture(lecture_id)
+        if not lecture:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        # Check if summary already exists
+        if lecture.get("summary"):
+            print(f"📋 Using cached summary for lecture {lecture_id}")
+            return {
+                "summary": lecture["summary"]["text"],
+                "audio_url": lecture["summary"]["audio_url"],
+                "word_count": lecture["summary"]["word_count"],
+                "cached": True
+            }
+        
+        print(f"\n📝 Generating new summary for: {lecture.get('filename')}")
+        
+        # Generate summary
+        summary_start = time.time()
+        summary_data = await generate_lecture_summary(
+            lecture["transcript"],
+            lecture.get("filename", "this lecture")
+        )
+        summary_time = time.time() - summary_start
+        print(f"⏱️ Summary generation completed in {summary_time:.2f}s")
+        print(f"📊 Summary: {summary_data['word_count']} words, {summary_data['detail_level']} level")
+        
+        # Generate audio with cloned professor voice
+        audio_start = time.time()
+        voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
+        print(f"🎙️ Generating audio with cloned voice: {voice_id}")
+        
+        audio_path = await generate_summary_audio(
+            summary_data["summary"],
+            voice_id=voice_id,
+            language="en"
+        )
+        audio_time = time.time() - audio_start
+        print(f"⏱️ Audio generation completed in {audio_time:.2f}s")
+        
+        audio_filename = os.path.basename(audio_path)
+        audio_url = f"/api/audio/{audio_filename}"
+        
+        # Save summary to lecture data (cache it)
+        lecture["summary"] = {
+            "text": summary_data["summary"],
+            "audio_url": audio_url,
+            "audio_path": audio_path,
+            "word_count": summary_data["word_count"],
+            "detail_level": summary_data["detail_level"],
+            "generated_at": datetime.now().isoformat()
+        }
+        save_lecture(lecture_id, lecture)
+        
+        print(f"✅ Summary saved and cached for future use")
+        
+        return {
+            "summary": summary_data["summary"],
+            "audio_url": audio_url,
+            "word_count": summary_data["word_count"],
+            "detail_level": summary_data["detail_level"],
+            "cached": False
+        }
+    
+    except Exception as e:
+        print(f"❌ Summary generation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
