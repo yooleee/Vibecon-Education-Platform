@@ -78,12 +78,16 @@ function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
     }
   }, [currentAudio]);
 
-  // Initialize V2 session when switching to V2 mode
+  // Initialize V2 session when switching to V2 mode or when language changes
   useEffect(() => {
-    if (useV2 && !sessionId) {
+    if (useV2) {
+      // Reinitialize session when language changes
+      if (sessionId) {
+        console.log('🔄 Language changed, reinitializing session...');
+      }
       initializeSession();
     }
-  }, [useV2, lectureId]);
+  }, [useV2, lectureId, selectedLanguage]);
 
   const initializeSession = async () => {
     try {
