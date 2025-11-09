@@ -171,7 +171,10 @@ async def upload_lecture(file: UploadFile = File(...)):
             "progress": 70,
             "message": "Processing transcript..."
         })
+        chunking_start = time.time()
         chunks = chunk_text(transcript)
+        chunking_time = time.time() - chunking_start
+        print(f"⏱️ Chunking completed in {chunking_time:.2f}s")
         
         # Generate embeddings for each chunk
         upload_progress[lecture_id].update({
@@ -179,8 +182,19 @@ async def upload_lecture(file: UploadFile = File(...)):
             "progress": 80,
             "message": "Generating embeddings..."
         })
-        print(f"\n🧠 Generating embeddings...")
+        print(f"\n🧠 Generating embeddings for {len(chunks)} chunks...")
+        embeddings_start = time.time()
         embeddings = await generate_embeddings(chunks)
+        embeddings_time = time.time() - embeddings_start
+        print(f"⏱️ Embeddings completed in {embeddings_time:.2f}s")
+        
+        # Calculate total processing time
+        total_processing_time = analysis_time + parallel_time + chunking_time + embeddings_time
+        print(f"\n📊 TOTAL PROCESSING TIME: {total_processing_time:.2f}s")
+        print(f"   ├─ Audio Analysis: {analysis_time:.2f}s ({analysis_time/total_processing_time*100:.1f}%)")
+        print(f"   ├─ Parallel (Voice+Transcribe): {parallel_time:.2f}s ({parallel_time/total_processing_time*100:.1f}%)")
+        print(f"   ├─ Chunking: {chunking_time:.2f}s ({chunking_time/total_processing_time*100:.1f}%)")
+        print(f"   └─ Embeddings: {embeddings_time:.2f}s ({embeddings_time/total_processing_time*100:.1f}%)")
         
         # Save lecture data with cloned voice ID
         upload_progress[lecture_id].update({
