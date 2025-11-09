@@ -1,6 +1,42 @@
 [
   {
-    "content": "Run comprehensive testing via testing_agent",
-    "status": "completed"
+    "content": "Analyze partner's new youtube_service.py and integrate into codebase",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's server.py changes (YouTube/delete endpoints) with our V2 routes",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's storage.py changes (delete functionality) with current version",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's transcription_service.py updates",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's LectureList.jsx (delete button) with current version",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's App.jsx UI upgrades with our VoiceTutorInterfaceV2 integration",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's CSS files (App.css, index.css) for UI improvements",
+    "status": "pending"
+  },
+  {
+    "content": "Merge partner's LectureViewer.jsx updates",
+    "status": "pending"
+  },
+  {
+    "content": "Update requirements.txt to include both partner's and our dependencies",
+    "status": "pending"
+  },
+  {
+    "content": "Test merged application end-to-end",
+    "status": "pending"
   }
 ]
