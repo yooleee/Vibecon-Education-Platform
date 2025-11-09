@@ -81,6 +81,8 @@ function AppContent() {
 
   return (
     <div className="app-container">
+      <Header />
+      
       {/* Hero Section */}
       <section ref={heroRef} className="section-hero" data-testid="hero-section">
         <div className="container text-center">
