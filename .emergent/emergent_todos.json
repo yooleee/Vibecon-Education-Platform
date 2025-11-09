@@ -1,0 +1,38 @@
+[
+  {
+    "content": "Install LangGraph dependencies (langgraph, langchain, langchain-openai) and restart backend",
+    "status": "pending"
+  },
+  {
+    "content": "Create MongoDB session and conversation models with UUID + UTC",
+    "status": "pending"
+  },
+  {
+    "content": "Implement minimal StateGraph with MessagesState in /backend/graph/graph.py",
+    "status": "pending"
+  },
+  {
+    "content": "Create session management API endpoint POST /api/v2/session/start",
+    "status": "pending"
+  },
+  {
+    "content": "Implement SSE streaming endpoint POST /api/v2/graph/query-stream with text-only POC",
+    "status": "pending"
+  },
+  {
+    "content": "Integrate Cartesia TTS with phrase-level buffering into graph",
+    "status": "pending"
+  },
+  {
+    "content": "Wire retrieval service (embeddings + top-k chunks) into graph",
+    "status": "pending"
+  },
+  {
+    "content": "Implement MongoDB persistence for conversation history",
+    "status": "pending"
+  },
+  {
+    "content": "Test POC: latency (≤3s first audio), follow-up memory, multilingual support",
+    "status": "pending"
+  }
+]
