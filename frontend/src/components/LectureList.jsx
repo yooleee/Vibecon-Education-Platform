@@ -108,8 +108,27 @@ function LectureList({ lectures, loading, onSelectLecture, onRefresh }) {
                     startIcon={<PlayArrow />}
                     onClick={() => onSelectLecture(lecture)}
                     data-testid={`open-lecture-${lecture.id}`}
+                    sx={{ mb: 1 }}
                   >
                     Open AI Tutor
+                  </Button>
+                  
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Mic />}
+                    onClick={() => handleStartSession(lecture)}
+                    data-testid={`start-session-${lecture.id}`}
+                    sx={{
+                      borderColor: '#007AFF',
+                      color: '#007AFF',
+                      '&:hover': {
+                        borderColor: '#0051D5',
+                        backgroundColor: 'rgba(0, 122, 255, 0.08)',
+                      }
+                    }}
+                  >
+                    Start Session
                   </Button>
                 </CardContent>
               </Card>
