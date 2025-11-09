@@ -7,7 +7,7 @@ import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
 import './App.css';
 
-const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 function AppContent() {
   const { user, isAuthenticated, loginWithGoogle, logout } = useAuth();
