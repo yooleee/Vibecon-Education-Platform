@@ -3,21 +3,32 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
-};
+}
 
-export const AuthProvider = ({ children, backendUrl }) => {
+export function AuthProvider({ children, backendUrl }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('auth_token'));
+  const [token, setToken] = useState(() => {
+    // Get token from localStorage on mount
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('auth_token');
+    }
+    return null;
+  });
 
   // Setup axios interceptor to attach token to all requests
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     const requestInterceptor = axios.interceptors.request.use(
       (config) => {
         if (token) {
@@ -33,7 +44,7 @@ export const AuthProvider = ({ children, backendUrl }) => {
       (error) => {
         if (error.response?.status === 401) {
           // Token expired or invalid, logout
-          logout();
+          handleLogout();
         }
         return Promise.reject(error);
       }
@@ -47,6 +58,11 @@ export const AuthProvider = ({ children, backendUrl }) => {
 
   // Load user on mount if token exists
   useEffect(() => {
+    if (!token || !backendUrl) {
+      setLoading(false);
+      return;
+    }
+
     const loadUser = async () => {
       try {
         const response = await axios.get(`${backendUrl}/api/auth/me`, {
@@ -64,11 +80,7 @@ export const AuthProvider = ({ children, backendUrl }) => {
       }
     };
 
-    if (token) {
-      loadUser();
-    } else {
-      setLoading(false);
-    }
+    loadUser();
   }, [token, backendUrl]);
 
   const loginWithGoogle = async (googleToken) => {
@@ -94,7 +106,7 @@ export const AuthProvider = ({ children, backendUrl }) => {
     }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem('auth_token');
     setToken(null);
     setUser(null);
@@ -105,8 +117,9 @@ export const AuthProvider = ({ children, backendUrl }) => {
     loading,
     isAuthenticated: !!user,
     loginWithGoogle,
-    logout
+    logout: handleLogout
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+}
+
