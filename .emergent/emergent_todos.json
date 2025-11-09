@@ -1,6 +1,62 @@
 [
   {
-    "content": "Restart services and test merged application",
-    "status": "completed"
+    "content": "Install emergentintegrations library for LLM chat integration",
+    "status": "pending"
+  },
+  {
+    "content": "Retrieve Emergent LLM key using emergent_integrations_manager tool",
+    "status": "pending"
+  },
+  {
+    "content": "Create quiz service with LLM integration (quiz_service.py) for question generation and evaluation",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizSession and QuizResult MongoDB models (models/quiz.py)",
+    "status": "pending"
+  },
+  {
+    "content": "Create quiz routes (routers/quiz_routes.py) with session management endpoints",
+    "status": "pending"
+  },
+  {
+    "content": "Add quiz routes to server.py and test backend with curl",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizTriggerButton component in VoiceTutorInterfaceV2.jsx",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizConfigModal for quiz settings (questions count, types, mode)",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizInterface main container component",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizQuestion, QuizAnswerOptions, QuizVoiceInput components",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizFeedback and QuizProgress components",
+    "status": "pending"
+  },
+  {
+    "content": "Create QuizResults screen with celebration effects",
+    "status": "pending"
+  },
+  {
+    "content": "Add quiz CSS styling following design guidelines",
+    "status": "pending"
+  },
+  {
+    "content": "Test complete quiz flow with voice interaction",
+    "status": "pending"
+  },
+  {
+    "content": "Create quiz history endpoints and QuizHistoryDashboard component",
+    "status": "pending"
   }
 ]
