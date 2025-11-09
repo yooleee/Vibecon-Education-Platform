@@ -1,22 +1,14 @@
 [
   {
-    "content": "Investigate current multilingual implementation in backend",
-    "status": "completed"
+    "content": "Remove full transcript viewer from lecture viewer",
+    "status": "in_progress"
   },
   {
-    "content": "Fix multilingual language parameter handling",
-    "status": "completed"
+    "content": "Fix LiveKit connection and agent setup",
+    "status": "pending"
   },
   {
-    "content": "Add LiveKit integration to frontend",
-    "status": "completed"
-  },
-  {
-    "content": "Test multilingual feature with all languages",
-    "status": "completed"
-  },
-  {
-    "content": "Test LiveKit feature end-to-end",
-    "status": "completed"
+    "content": "Test LiveKit real-time voice chat",
+    "status": "pending"
   }
 ]
