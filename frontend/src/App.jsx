@@ -1086,6 +1086,184 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
   );
 }
 
+// Quiz History Section Component
+function QuizHistorySection({ backendUrl }) {
+  const [quizHistory, setQuizHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    loadQuizHistory();
+  }, []);
+
+  const loadQuizHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${backendUrl}/api/quiz/history?limit=20`);
+      setQuizHistory(response.data.results || []);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load quiz history');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center" style={{ minHeight: '300px' }}>
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="glass-card" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.3)', textAlign: 'center' }}>
+        <p style={{ color: 'var(--accent-error)' }}>{error}</p>
+      </div>
+    );
+  }
+
+  if (quizHistory.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="glass-card text-center"
+        style={{ padding: 'var(--space-3xl)' }}
+      >
+        <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>📝</div>
+        <h3 style={{ marginBottom: 'var(--space-sm)', fontWeight: 600 }}>No quiz history yet</h3>
+        <p className="text-secondary">Take your first quiz to start tracking your progress</p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="grid grid-3" data-testid="quiz-history-list">
+      {quizHistory.map((result, index) => (
+        <QuizHistoryCard key={result.result_id || index} result={result} index={index} />
+      ))}
+    </div>
+  );
+}
+
+// Quiz History Card Component
+function QuizHistoryCard({ result, index }) {
+  const percentage = result.score?.percentage || 0;
+  const getGradeColor = (pct) => {
+    if (pct >= 80) return 'var(--quiz-correct)';
+    if (pct >= 60) return 'var(--accent-primary)';
+    return 'var(--quiz-incorrect)';
+  };
+
+  const getGradeEmoji = (pct) => {
+    if (pct >= 80) return '🎉';
+    if (pct >= 60) return '👍';
+    return '💪';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="glass-card"
+      data-testid={`quiz-history-card-${index}`}
+    >
+      <div className="flex justify-between items-start mb-md">
+        <div style={{ flex: 1 }}>
+          <h4 className="mb-sm">{result.lecture_title || 'Quiz'}</h4>
+          <p className="text-secondary text-sm">
+            {new Date(result.completed_at).toLocaleDateString()}
+          </p>
+        </div>
+        <div style={{ fontSize: '2rem' }}>{getGradeEmoji(percentage)}</div>
+      </div>
+
+      {/* Score Circle */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-md)' }}>
+        <div style={{ 
+          position: 'relative', 
+          width: '80px', 
+          height: '80px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke="var(--progress-incomplete)"
+              strokeWidth="8"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke={getGradeColor(percentage)}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 40}`}
+              strokeDashoffset={`${2 * Math.PI * 40 * (1 - percentage / 100)}`}
+              style={{ transition: 'stroke-dashoffset 1s ease' }}
+            />
+          </svg>
+          <div style={{ 
+            position: 'absolute',
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            color: getGradeColor(percentage)
+          }}>
+            {percentage}%
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="flex justify-around" style={{ borderTop: '1px solid var(--glass-light-border)', paddingTop: 'var(--space-md)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--quiz-correct)' }}>
+            {result.score?.correct || 0}
+          </div>
+          <div className="text-secondary text-sm">Correct</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--quiz-incorrect)' }}>
+            {result.score?.incorrect || 0}
+          </div>
+          <div className="text-secondary text-sm">Incorrect</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            {result.score?.total || 0}
+          </div>
+          <div className="text-secondary text-sm">Total</div>
+        </div>
+      </div>
+
+      {/* Config Info */}
+      <div className="flex gap-sm mt-md" style={{ flexWrap: 'wrap' }}>
+        {result.config?.voice_mode && (
+          <span className="badge badge-primary" style={{ fontSize: '0.75rem' }}>
+            Voice
+          </span>
+        )}
+        <span className="badge" style={{ fontSize: '0.75rem', background: 'var(--background-secondary)' }}>
+          {result.score?.total || 0} Questions
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
 // Main App component with AuthProvider wrapper
 function App() {
   return (
