@@ -601,6 +601,15 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
           </motion.div>
         </div>
       )}
+
+      {/* LiveKit Session Dialog */}
+      {livekitSelectedLecture && (
+        <LiveKitSessionDialog
+          open={livekitSessionOpen}
+          onClose={handleCloseSession}
+          lecture={livekitSelectedLecture}
+        />
+      )}
     </div>
   );
 }
