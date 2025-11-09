@@ -28,11 +28,19 @@
     "status": "completed"
   },
   {
+    "content": "Fix LiveKit agent - installed missing silero plugin and restarted agent",
+    "status": "completed"
+  },
+  {
     "content": "Test quiz generation flow with voice and text modes",
-    "status": "in_progress"
+    "status": "pending"
   },
   {
     "content": "Test quiz results display and saving to database",
+    "status": "pending"
+  },
+  {
+    "content": "Test LiveKit real-time voice chat functionality",
     "status": "pending"
   },
   {
