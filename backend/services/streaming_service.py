@@ -166,19 +166,17 @@ Provide a clear, concise answer based on the lecture content."""
             try:
                 print(f"🎙️ Generating final TTS...")
                 audio_path = await text_to_speech_cartesia(remaining, voice_id=cloned_voice_id)
-                print(f"✅ Final TTS generated")
-                
-                with open(audio_path, "rb") as f:
-                    audio_data = base64.b64encode(f.read()).decode('utf-8')
+                audio_filename = os.path.basename(audio_path)
+                audio_url = f"/api/audio/{audio_filename}"
+                print(f"✅ Final TTS generated: {audio_url}")
                 
                 yield {
                     "type": "audio",
                     "data": {
-                        "audio": audio_data,
+                        "audio_url": audio_url,
                         "text": remaining
                     }
                 }
-                os.remove(audio_path)
             except Exception as e:
                 print(f"❌ Final TTS error: {e}")
         
