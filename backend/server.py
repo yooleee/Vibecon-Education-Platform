@@ -315,8 +315,8 @@ async def upload_lecture(file: UploadFile = File(...), current_user: dict = Depe
 
 
 @app.post("/api/upload-youtube")
-async def upload_youtube_lecture(request: YouTubeRequest):
-    """Process a YouTube video as a lecture with voice cloning"""
+async def upload_youtube_lecture(request: YouTubeRequest, current_user: dict = Depends(get_current_user)):
+    """Process a YouTube video as a lecture with voice cloning (requires authentication)"""
     lecture_id = str(uuid.uuid4())
     
     try:
