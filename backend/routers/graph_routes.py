@@ -351,19 +351,20 @@ Remember: Your emotion tags and markup will be used for voice generation but won
                         audio_filename = os.path.basename(audio_path)
                         audio_url = f"/api/audio/{audio_filename}"
                         
-                        yield f"data: {json.dumps({'type': 'audio', 'data': {'audio_url': audio_url, 'text': remaining}})}\n\n"
+                        yield f"data: {json.dumps({'type': 'audio', 'data': {'audio_url': audio_url, 'text': clean_remaining}})}\n\n"
                     except Exception as e:
                         print(f"❌ Final TTS error: {e}")
                 
-                # Persist conversation
+                # Persist conversation (store CLEAN version in history)
                 print("💾 Persisting conversation...")
-                initial_state["messages"].append(AIMessage(content=full_response))
-                initial_state["response_text"] = full_response
+                clean_response = clean_text_for_display(full_response)
+                initial_state["messages"].append(AIMessage(content=clean_response))
+                initial_state["response_text"] = clean_response
                 
                 await persist_node(initial_state)
                 
-                # Send complete
-                yield f"data: {json.dumps({'type': 'complete', 'data': {'full_response': full_response, 'relevant_chunks': initial_state.get('relevant_chunks', [])}})}\n\n"
+                # Send complete with clean response
+                yield f"data: {json.dumps({'type': 'complete', 'data': {'full_response': clean_response, 'relevant_chunks': initial_state.get('relevant_chunks', [])}})}\n\n"
                 
             except Exception as e:
                 print(f"❌ Stream error: {e}")
