@@ -15,6 +15,7 @@ from services.transcription_service import transcribe_audio
 from services.embedding_service import generate_embeddings, compute_similarity
 from services.query_service import answer_query, text_to_speech
 from services.youtube_service import download_youtube_audio, validate_youtube_url
+from services.summary_service import generate_lecture_summary, generate_summary_audio
 from utils.storage import save_lecture, load_lecture, list_lectures, delete_lecture
 from utils.chunking import chunk_text
 
