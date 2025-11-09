@@ -1,13 +1,14 @@
-# EduVoice LiveKit Real‑Time Voice Agent — Development Plan
+# EduVoice AI Education Platform — Development Plan
 
 ## 1) Objectives (Core Outcomes)
 - ✅ Add a distinct "Start Session" button on each lecture card (separate from existing per‑lecture tutor UI)
 - ✅ Enable real‑time, bidirectional voice conversation using LiveKit
 - ✅ Scope the agent's context strictly to the selected lecture (transcript + key chunks)
 - ✅ Use GPT‑4 for LLM responses; Cartesia for TTS; Deepgram for STT in agent
+- 🔄 **NEW**: Add quiz generation feature to frontend with voice-first interaction
 - Ship a working POC first, then a V1 app flow, then expand & harden without breaking current features
 
-## 2) Phases & Implementation Steps (POC → V1 → Expansion → Hardening)
+## 2) Phases & Implementation Steps
 
 ### Phase 1: Core POC (WebRTC + Agent) — ✅ COMPLETED
 **Status**: COMPLETED on 2025-11-09
@@ -30,27 +31,113 @@
 - `/app/frontend/src/components/LectureList.jsx` - Added Start Session button
 - `/app/frontend/src/components/LiveKitSessionDialog.jsx` - New dialog component
 
-**User Stories (Phase 1)** - Ready for Testing:
-1. ✅ As a user, I can click Start Session and see a connect modal with mic permission prompt.
-2. 🔄 As a user, after joining, I hear an immediate welcome from the agent. (Needs user testing)
-3. 🔄 As a user, I can speak and receive a spoken reply within ~2–3s. (Needs user testing)
-4. ✅ As a user, I can end the session cleanly.
-5. ✅ As a developer, I can see logs confirming lecture_id metadata reached the agent.
+### Phase 2: Quiz Feature Integration to Frontend — 🔄 IN PROGRESS
+**Status**: Starting Implementation
 
-**Testing Instructions for User**:
-1. Sign in with Google at https://smart-quiz-ai-2.preview.emergentagent.com
-2. Upload or select an existing lecture
-3. Click "Start Session" button on the lecture card
-4. Allow microphone permissions when prompted
-5. Wait for connection (should see "Connected - Speak now")
-6. Speak a question about the lecture
-7. Listen for the AI tutor's response
-8. Test mute/unmute and leave controls
+**Goal**: Add quiz generation UI to frontend and connect to existing backend quiz API
 
-### Phase 2: V1 App Development (Minimal but Complete Flow) — IN PROGRESS
+**User Requirements**:
+1. Quiz trigger button in LectureViewer (next to summary button)
+2. Use default settings (5 questions, medium difficulty, all types) - no config modal needed
+3. Default to voice mode with text fallback option
+4. Create separate Quiz History section in main App
+
+**Backend API (Already Exists)**:
+- ✅ POST /api/quiz/session/start - Generate quiz questions
+- ✅ GET /api/quiz/session/{session_id}/next - Get next question
+- ✅ POST /api/quiz/session/{session_id}/answer - Submit text answer
+- ✅ POST /api/quiz/session/answer-voice - Submit voice answer
+- ✅ GET /api/quiz/session/{session_id}/results - Get quiz results
+- ✅ POST /api/quiz/session/{session_id}/save - Save quiz results to database
+- ✅ GET /api/quiz/history - Get user's quiz history
+
+**Frontend Tasks**:
+1. **LectureViewer Component Updates**:
+   - Add "Start Quiz" button next to "Generate Summary" button
+   - Integrate quiz trigger with backend API
+   - Handle quiz session creation
+   
+2. **Quiz Components** (Already exist in `/app/frontend/src/components/quiz/`):
+   - ✅ QuizInterface.jsx - Main quiz container
+   - ✅ QuizProgress.jsx - Progress tracking
+   - ✅ QuizQuestion.jsx - Question display
+   - ✅ QuizAnswerOptions.jsx - Answer selection
+   - ✅ QuizVoiceInput.jsx - Voice recording
+   - ✅ QuizFeedback.jsx - Feedback display
+   - ✅ QuizResults.jsx - Results screen
+   - ✅ QuizTriggerButton.jsx - Trigger button component
+   - **Tasks**: 
+     - Import and integrate these components into LectureViewer
+     - Add quiz state management
+     - Connect to backend quiz API endpoints
+     - Ensure voice mode is default with text fallback
+   
+3. **Quiz History Section**:
+   - Create new QuizHistorySection in App.jsx
+   - Add navigation to Quiz History from header
+   - Display user's past quiz results
+   - Show quiz analytics (average score, total quizzes, etc.)
+   - Allow filtering by lecture
+   
+4. **Styling & Design**:
+   - Follow design guidelines from `/app/design_guidelines.md`
+   - Use existing design tokens and color system
+   - Maintain glassmorphism aesthetic
+   - Ensure responsive design for mobile
+   - Add proper data-testid attributes for all interactive elements
+
+**Implementation Steps**:
+1. Update LectureViewer.jsx:
+   - Add "Start Quiz" button in header actions (next to summary button)
+   - Add quiz state management (showQuiz, quizSession, etc.)
+   - Implement handleStartQuiz function to call backend API
+   - Add QuizInterface component integration
+   
+2. Integrate QuizInterface:
+   - Import QuizInterface component
+   - Pass necessary props (lectureId, sessionId, voiceMode, onClose)
+   - Handle quiz completion and results display
+   - Implement error handling for API failures
+   
+3. Create Quiz History Section:
+   - Add new section in App.jsx after AI Tutor section
+   - Create QuizHistoryDashboard component
+   - Fetch quiz history from backend API
+   - Display quiz results with filtering options
+   - Show analytics and statistics
+   
+4. Testing:
+   - Test quiz generation with different lectures
+   - Test voice input functionality
+   - Test text input fallback
+   - Verify quiz results are saved correctly
+   - Test quiz history display and filtering
+   - Ensure mobile responsiveness
+
+**User Stories (Phase 2)**:
+1. As a user, I can click "Start Quiz" button in LectureViewer to begin a quiz
+2. As a user, I can answer quiz questions using voice (default) or text
+3. As a user, I see immediate feedback after each answer
+4. As a user, I see my final quiz results with score and breakdown
+5. As a user, I can view my quiz history in a dedicated section
+6. As a user, I can filter quiz history by lecture
+7. As a user, the quiz UI follows the same design language as the rest of the app
+
+**Success Criteria**:
+- ✅ Backend quiz API endpoints are functional
+- 🔄 "Start Quiz" button appears in LectureViewer next to summary button
+- 🔄 Quiz generates 5 questions with default settings (no config modal)
+- 🔄 Voice mode is default with text input as fallback option
+- 🔄 Quiz results are displayed at completion
+- 🔄 Quiz history section shows past quiz results
+- 🔄 All quiz components follow design guidelines
+- 🔄 All interactive elements have data-testid attributes
+- 🔄 Mobile responsive design works correctly
+
+### Phase 3: LiveKit V1 App Development (Minimal but Complete Flow)
 **Status**: Not Started - Awaiting Phase 1 user testing feedback
 
-Goal: Refine end‑to‑end Start Session flow based on user feedback
+**Goal**: Refine end‑to‑end Start Session flow based on user feedback
 
 **Planned Tasks**:
 - Backend (FastAPI)
@@ -80,17 +167,10 @@ Goal: Refine end‑to‑end Start Session flow based on user feedback
   - Test with different lecture lengths and topics
   - Test error scenarios (no mic, network issues, etc.)
 
-**User Stories (Phase 2)**:
-1. As a user, I see a Start Session button on every lecture card. ✅
-2. As a user, I can join a room and see clear connection status. ✅
-3. As a user, I can mute/unmute and leave anytime. ✅
-4. As a user, I get readable errors when join fails or mic is blocked. 🔄
-5. As a user, the UI feels consistent with the app (colors, spacing, glass surfaces). ✅
-
-### Phase 3: Feature Expansion (Context, Transcript, Quality)
+### Phase 4: Feature Expansion (Context, Transcript, Quality)
 **Status**: Not Started
 
-Goal: Make the agent lecture‑aware and improve UX
+**Goal**: Make the agent lecture‑aware and improve UX
 
 **Planned Tasks**:
 - Agent Context Enhancement
@@ -114,23 +194,11 @@ Goal: Make the agent lecture‑aware and improve UX
   - Tune VAD/turn detection for <2s latency
   - Implement LLM context windowing for long conversations
   - Add conversation summarization for context management
-  
-- Testing
-  - E2E: Ask factual question → verify contextually correct answer
-  - Test with various question types (definition, explanation, example)
-  - Verify citations are accurate
 
-**User Stories (Phase 3)**:
-1. As a user, I can ask content‑specific questions and get accurate, lecture‑aware answers.
-2. As a user, I can view a simple running transcript of the conversation.
-3. As a user, I can quickly retry joining if disconnected.
-4. As a user, I can switch response language (en → es) for TTS where supported.
-5. As a user, I see brief citations (e.g., "from section 02:15–03:05").
-
-### Phase 4: Hardening & Polish (Production Readiness)
+### Phase 5: Hardening & Polish (Production Readiness)
 **Status**: Not Started
 
-Goal: Stability, security, accessibility, and ops
+**Goal**: Stability, security, accessibility, and ops
 
 **Planned Tasks**:
 - Tokens & Security
@@ -151,72 +219,37 @@ Goal: Stability, security, accessibility, and ops
   - Respect prefers-reduced-motion
   - Add mobile-optimized layout
   
-- Compatibility & Docs
-  - Document agent worker deployment runbook
-  - Create troubleshooting guide
-  - Document environment variables
-  - Add API documentation
-  
 - Testing
   - Run comprehensive testing agent suite
   - Fix all regressions
   - Verify no console errors
   - Test on multiple browsers and devices
 
-**User Stories (Phase 4)**:
-1. As a user, long sessions remain active without manual re‑join.
-2. As a user, I can select my microphone/speaker devices.
-3. As a user, screen reader announces connection and error states.
-4. As a user, I can resume a recent session from history.
-5. As a user, the UI remains responsive and smooth on mobile.
-
 ## 3) Current Status & Next Actions
 
 **Current Status**:
-- ✅ Phase 1 (POC) complete and ready for user testing
-- 🔄 Awaiting user feedback to proceed with Phase 2
+- ✅ Phase 1 (LiveKit POC) complete and ready for user testing
+- 🔄 Phase 2 (Quiz Feature Integration) starting implementation
 - LiveKit agent worker running and connected (ID: AW_irjxK9mbCGMh)
-- Backend API endpoint functional at POST /api/livekit/session/start
-- Frontend UI integrated and deployed
+- Backend quiz API fully functional
+- Frontend quiz components exist but not integrated into main UI
 
 **Immediate Next Actions**:
-1. **User Testing** - User should test the POC flow:
+1. **Phase 2 Implementation** - Add quiz feature to frontend:
+   - Update LectureViewer with "Start Quiz" button
+   - Integrate existing QuizInterface components
+   - Create Quiz History section
+   - Test quiz flow end-to-end
+   
+2. **LiveKit Testing** - User should test the POC flow:
    - Sign in → Select lecture → Click Start Session → Speak → Verify response
-2. **Collect Feedback** - Gather user feedback on:
-   - Connection reliability
-   - Audio quality
-   - Response accuracy and relevance
-   - Latency/responsiveness
-   - UI/UX clarity
-3. **Bug Fixes** - Address any critical issues found during testing
-4. **Phase 2 Planning** - Based on feedback, prioritize Phase 2 tasks
+   
+3. **Quiz Testing** - After implementation:
+   - Sign in → Select lecture → Click Start Quiz → Answer questions → View results
+   - Test voice mode and text fallback
+   - Verify quiz history displays correctly
 
-**Deployment Notes**:
-- Agent worker running via: `nohup python lecture_agent.py dev > /var/log/livekit-agent.log 2>&1 &`
-- Logs available at: `/var/log/livekit-agent.log`
-- Backend logs: `/var/log/supervisor/backend.err.log`
-- Frontend logs: `/var/log/supervisor/frontend.err.log`
-
-## 4) Success Criteria (Definition of Done)
-
-**Phase 1 (Current)**:
-- ✅ Clicking Start Session on any lecture opens a modal, requests mic permission, and joins a room
-- 🔄 Agent greets within ~2–3s (needs user verification)
-- 🔄 Agent answers at least one spoken question (needs user verification)
-- ✅ Backend route /api/livekit/session/start works reliably
-- ✅ Tokens scoped to room; metadata includes lecture_id
-- ✅ UI follows design tokens (accent #007AFF for primary), glass surfaces, clear states
-- ✅ All controls have data-testid attributes
-- 🔄 No critical console or backend errors (needs verification)
-
-**Phase 2+ (Future)**:
-- Responses use lecture context via vector similarity
-- Session data persisted to MongoDB
-- Error handling covers all edge cases
-- Testing agent e2e checks pass
-- Performance meets <2s response time target
-
-## 5) Technical Architecture
+## 4) Technical Architecture
 
 **Backend Stack**:
 - FastAPI server with LiveKit token generation
@@ -225,50 +258,116 @@ Goal: Stability, security, accessibility, and ops
 - Cartesia for TTS (using existing integration)
 - Deepgram Nova-2 for STT
 - Silero VAD for voice activity detection
-- MongoDB for session/lecture storage
+- MongoDB for session/lecture/quiz storage
+- **Quiz API**: Existing endpoints for quiz generation, evaluation, and history
 
 **Frontend Stack**:
 - React with Material-UI components
 - livekit-client (v2.15.14) for WebRTC
 - @livekit/components-react (v2.9.15)
 - Custom LiveKitSessionDialog component
+- **Quiz Components**: QuizInterface, QuizProgress, QuizQuestion, QuizAnswerOptions, etc.
+- Framer Motion for animations
+- Axios for API calls
 
-**Agent Worker**:
-- Runs as separate Python process
-- Connects to LiveKit server via WebSocket
-- Receives lecture context from MongoDB
-- Processes audio in real-time pipeline: VAD → STT → LLM → TTS
+**Quiz Data Flow**:
+1. User clicks "Start Quiz" in LectureViewer
+2. Frontend calls POST /api/quiz/session/start with lectureId
+3. Backend generates 5 quiz questions using LLM
+4. Frontend displays first question with voice/text input options
+5. User answers (voice or text) → Frontend submits to backend
+6. Backend evaluates answer and returns feedback
+7. Frontend displays feedback with audio (voice mode)
+8. Repeat for remaining questions
+9. Frontend displays final results
+10. Results saved to MongoDB via backend API
+11. Quiz history accessible from dedicated section
 
-**Data Flow**:
-1. User clicks "Start Session" → Frontend requests token from backend
-2. Backend generates LiveKit token with metadata (lecture_id, user_id)
-3. Frontend connects to LiveKit room using token
-4. Agent worker joins room automatically (dispatched by LiveKit)
-5. Agent loads lecture context from MongoDB
-6. User speaks → VAD detects speech → STT transcribes → LLM generates response → TTS speaks
-7. Bidirectional audio streams via WebRTC
+## 5) File Structure
+
+**Backend** (Existing):
+```
+/app/backend/
+├── routers/
+│   ├── quiz_routes.py          ✅ Quiz API endpoints
+│   └── graph_routes.py         ✅ LiveKit routes
+├── services/
+│   ├── quiz_service.py         ✅ Quiz generation & evaluation
+│   ├── voice_service.py        ✅ Cartesia TTS
+│   └── transcription_service.py ✅ Audio transcription
+├── models/
+│   ├── quiz.py                 ✅ Quiz data models
+│   └── user.py                 ✅ User models
+├── lecture_agent.py            ✅ LiveKit agent worker
+└── server.py                   ✅ FastAPI main app
+```
+
+**Frontend** (To be updated):
+```
+/app/frontend/src/
+├── components/
+│   ├── quiz/
+│   │   ├── QuizInterface.jsx           ✅ Exists, needs integration
+│   │   ├── QuizProgress.jsx            ✅ Exists
+│   │   ├── QuizQuestion.jsx            ✅ Exists
+│   │   ├── QuizAnswerOptions.jsx       ✅ Exists
+│   │   ├── QuizVoiceInput.jsx          ✅ Exists
+│   │   ├── QuizFeedback.jsx            ✅ Exists
+│   │   ├── QuizResults.jsx             ✅ Exists
+│   │   ├── QuizTriggerButton.jsx       ✅ Exists
+│   │   └── QuizConfigModal.jsx         ✅ Exists (won't use per requirements)
+│   ├── LectureViewer.jsx               🔄 Needs update (add quiz button)
+│   ├── Header.jsx                      🔄 Needs update (add quiz history nav)
+│   └── LiveKitSessionDialog.jsx        ✅ Complete
+├── App.jsx                              🔄 Needs update (add quiz history section)
+└── styles/
+    └── quiz.css                         ✅ Exists
+```
 
 ## 6) Known Limitations & Future Improvements
 
 **Current Limitations**:
-- Agent context uses only first 3000 chars of transcript (Phase 3 will add vector search)
-- No conversation memory across sessions
-- No session persistence/resume capability
-- Single agent instance (no horizontal scaling yet)
-- No device selection UI
-- No transcript display
+- LiveKit agent context uses only first 3000 chars of transcript (Phase 4 will add vector search)
+- No conversation memory across LiveKit sessions
+- No session persistence/resume capability for LiveKit
+- Quiz results not yet displayed in LectureViewer (Phase 2 will add)
+- No quiz analytics dashboard (Phase 2 will add)
+- Single LiveKit agent instance (no horizontal scaling yet)
 
 **Planned Improvements**:
-- Vector similarity search for relevant context (Phase 3)
-- Conversation memory and summarization (Phase 3)
-- Session history and resume (Phase 4)
-- Multi-agent scaling (Phase 4)
-- Advanced audio controls (Phase 4)
-- Live transcript panel (Phase 3)
+- Vector similarity search for relevant context (Phase 4)
+- Conversation memory and summarization (Phase 4)
+- Session history and resume (Phase 5)
+- Quiz analytics dashboard with charts (Phase 2)
+- Quiz difficulty adaptation based on performance (Future)
+- Multi-agent scaling for LiveKit (Phase 5)
+- Advanced audio controls (Phase 5)
+
+## 7) Design Guidelines Reference
+
+**Color System** (from design_guidelines.md):
+- Primary: `#007AFF` (accent-primary)
+- Success/Correct: `#34C759` (quiz-correct)
+- Error/Incorrect: `#FF3B30` (quiz-incorrect)
+- Warning/Hint: `#FF9500` (quiz-hint)
+- Neutral: `#007AFF` (quiz-neutral)
+
+**Quiz-Specific Design Rules**:
+- Use white backgrounds for all quiz cards and questions
+- Use solid colors for answer options (no gradients)
+- Apply glassmorphism effects for depth
+- Ensure WCAG AA contrast compliance (4.5:1 for text)
+- Add data-testid attributes to all interactive elements
+- Support keyboard navigation
+- Provide focus states for all interactive elements
+- Use voice-first design with text fallback
 
 ## Notes
-- Phase 1 POC is complete and ready for user testing
+- Phase 1 (LiveKit POC) is complete and ready for user testing
+- Phase 2 (Quiz Integration) is starting implementation
 - No changes made to MONGO_URL or REACT_APP_BACKEND_URL (as required)
 - LiveKit credentials stored securely in backend .env only
-- Agent worker must remain running for sessions to work
-- All existing features (existing AI tutor, quiz, etc.) remain unchanged
+- LiveKit agent worker must remain running for sessions to work
+- Quiz backend API is fully functional and tested
+- All existing features (existing AI tutor, LiveKit, summary) remain unchanged
+- Design guidelines must be followed for all new UI components
