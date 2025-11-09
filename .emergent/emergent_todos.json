@@ -1,18 +1,6 @@
 [
   {
-    "content": "Update requirements.txt to include yt-dlp dependency",
-    "status": "completed"
-  },
-  {
-    "content": "Merge partner's CSS files (App.css, index.css) for UI improvements",
-    "status": "completed"
-  },
-  {
-    "content": "Merge partner's App.jsx UI upgrades with our VoiceTutorInterfaceV2 integration",
-    "status": "completed"
-  },
-  {
     "content": "Restart services and test merged application",
-    "status": "in_progress"
+    "status": "completed"
   }
 ]
