@@ -1,58 +1,34 @@
 [
   {
-    "content": "Install emergentintegrations library for LLM chat integration",
-    "status": "completed"
+    "content": "Install LiveKit dependencies in backend (livekit-api, livekit-agents with plugins, deepgram)",
+    "status": "pending"
   },
   {
-    "content": "Retrieve Emergent LLM key using emergent_integrations_manager tool",
-    "status": "completed"
+    "content": "Add LiveKit credentials to backend .env (LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)",
+    "status": "pending"
   },
   {
-    "content": "Create quiz service with LLM integration (quiz_service.py) for question generation and evaluation",
-    "status": "completed"
+    "content": "Create backend endpoint POST /api/livekit/session/start for token generation",
+    "status": "pending"
   },
   {
-    "content": "Create QuizSession and QuizResult MongoDB models (models/quiz.py)",
-    "status": "completed"
+    "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS",
+    "status": "pending"
   },
   {
-    "content": "Create quiz routes (routers/quiz_routes.py) with session management endpoints",
-    "status": "completed"
+    "content": "Install livekit-client in frontend (yarn add livekit-client)",
+    "status": "pending"
   },
   {
-    "content": "Add quiz routes to server.py and test backend with curl",
-    "status": "completed"
+    "content": "Add Start Session button to LectureList component",
+    "status": "pending"
   },
   {
-    "content": "Create QuizTriggerButton component in VoiceTutorInterfaceV2.jsx",
-    "status": "completed"
+    "content": "Create SessionDialog component for LiveKit room connection",
+    "status": "pending"
   },
   {
-    "content": "Create QuizConfigModal for quiz settings (questions count, types, mode)",
-    "status": "completed"
-  },
-  {
-    "content": "Create QuizInterface main container component",
-    "status": "completed"
-  },
-  {
-    "content": "Create QuizQuestion, QuizAnswerOptions, QuizVoiceInput components",
-    "status": "completed"
-  },
-  {
-    "content": "Create QuizFeedback and QuizProgress components",
-    "status": "completed"
-  },
-  {
-    "content": "Create QuizResults screen with celebration effects",
-    "status": "completed"
-  },
-  {
-    "content": "Add quiz CSS styling following design guidelines",
-    "status": "completed"
-  },
-  {
-    "content": "Check frontend for compilation errors and fix any issues",
-    "status": "completed"
+    "content": "Test POC: manual test of token generation, agent greeting, basic conversation",
+    "status": "pending"
   }
 ]
