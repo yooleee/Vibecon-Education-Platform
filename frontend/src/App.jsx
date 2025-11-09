@@ -816,7 +816,7 @@ function LectureCard({ lecture, index, onSelect, onDelete, canDelete }) {
 // Main App component with AuthProvider wrapper
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider backendUrl={BACKEND_URL}>
       <AppContent />
     </AuthProvider>
   );
