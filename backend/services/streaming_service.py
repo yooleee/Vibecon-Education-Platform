@@ -91,8 +91,8 @@ async def stream_voice_response(
         # Language-specific instructions
         language_instructions = {
             "en": "Respond in English.",
-            "es": "Responde en español. Provide entire answer in Spanish.",
-            "hi": "हिंदी में जवाब दें. Provide entire answer in Hindi."
+            "es": "IMPORTANTE: Responde COMPLETAMENTE en español. TODA tu respuesta debe estar en español, sin excepciones.",
+            "hi": "महत्वपूर्ण: आपका पूरा जवाब हिंदी में होना चाहिए। Your ENTIRE response MUST be in Hindi, no exceptions."
         }
         
         lang_instruction = language_instructions.get(language, language_instructions["en"])
