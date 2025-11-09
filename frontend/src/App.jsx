@@ -482,6 +482,14 @@ function UploadSection({ backendUrl, onUploadComplete, uploading, setUploading, 
             </div>
             {uploading && <p className="text-secondary mt-md">{uploadProgress}%</p>}
           </div>
+        ) : !isAuthenticated ? (
+          <>
+            <svg width="64" height="64" fill="none" stroke="var(--text-tertiary)" strokeWidth="2" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
+              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <h3 className="mb-sm">Sign in to upload lectures</h3>
+            <p className="text-secondary">Please sign in with Google to upload your own lecture videos</p>
+          </>
         ) : (
           <>
             <svg width="64" height="64" fill="none" stroke="var(--accent-primary)" strokeWidth="2" viewBox="0 0 24 24" style={{ margin: '0 auto var(--space-lg)' }}>
