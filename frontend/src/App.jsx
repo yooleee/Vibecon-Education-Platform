@@ -5,6 +5,7 @@ import axios from 'axios';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import VoiceTutorInterfaceV2 from './components/VoiceTutorInterfaceV2';
+import LiveKitSessionDialog from './components/LiveKitSessionDialog';
 import './App.css';
 import './styles/quiz.css';
 
@@ -17,6 +18,8 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [livekitSessionOpen, setLivekitSessionOpen] = useState(false);
+  const [livekitSelectedLecture, setLivekitSelectedLecture] = useState(null);
 
   // Refs for smooth scrolling
   const heroRef = useRef(null);
