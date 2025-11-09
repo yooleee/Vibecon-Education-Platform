@@ -20,7 +20,8 @@ from livekit.agents import (
     tts,
     AutoSubscribe,
 )
-from livekit.plugins import openai, deepgram, cartesia, silero
+from livekit.plugins import openai, deepgram, cartesia
+from livekit.plugins import silero
 
 # Local imports
 from utils.storage import load_lecture
