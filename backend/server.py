@@ -95,25 +95,43 @@ async def get_upload_progress(lecture_id: str):
 @app.post("/api/upload")
 async def upload_lecture(file: UploadFile = File(...)):
     """Upload and process a lecture video with voice cloning"""
+    lecture_id = str(uuid.uuid4())
+    
     try:
+        # Initialize progress tracking
+        upload_progress[lecture_id] = {
+            "status": "processing",
+            "stage": "uploading",
+            "progress": 0,
+            "message": "Uploading file..."
+        }
+        
         # Validate file type
         if not file.filename.endswith(('.mp4', '.MP4')):
             raise HTTPException(status_code=400, detail="Only MP4 files are supported")
         
-        # Generate unique ID
-        lecture_id = str(uuid.uuid4())
-        
         # Save uploaded file
+        upload_progress[lecture_id].update({"progress": 10, "message": "Saving file..."})
         video_path = os.path.join(UPLOAD_DIR, f"{lecture_id}.mp4")
         with open(video_path, "wb") as f:
             content = await file.read()
             f.write(content)
         
         # Extract audio
+        upload_progress[lecture_id].update({
+            "stage": "extracting",
+            "progress": 20,
+            "message": "Extracting audio..."
+        })
         audio_path = os.path.join(UPLOAD_DIR, f"{lecture_id}.wav")
         extract_audio_from_video(video_path, audio_path)
         
         # STEP 1: Extract best voice clip for cloning (5-10 seconds)
+        upload_progress[lecture_id].update({
+            "stage": "analyzing",
+            "progress": 30,
+            "message": "Analyzing audio quality..."
+        })
         print(f"\n🎤 Analyzing audio to find best voice sample...")
         from services.audio_analysis_service import extract_best_voice_clip
         voice_clip_path, clip_quality = extract_best_voice_clip(
@@ -123,8 +141,12 @@ async def upload_lecture(file: UploadFile = File(...)):
         )
         
         # STEP 2 & 3: Run voice cloning and transcription IN PARALLEL for speed
+        upload_progress[lecture_id].update({
+            "stage": "parallel_processing",
+            "progress": 45,
+            "message": "Cloning voice and transcribing (parallel)..."
+        })
         print(f"\n⚡ Starting parallel processing (voice cloning + transcription)...")
-        import asyncio
         from services.voice_service import clone_voice_from_audio
         
         # Run both tasks concurrently
@@ -139,13 +161,28 @@ async def upload_lecture(file: UploadFile = File(...)):
         print(f"✅ Parallel processing complete!")
         
         # Chunk transcript
+        upload_progress[lecture_id].update({
+            "stage": "chunking",
+            "progress": 70,
+            "message": "Processing transcript..."
+        })
         chunks = chunk_text(transcript)
         
         # Generate embeddings for each chunk
+        upload_progress[lecture_id].update({
+            "stage": "embeddings",
+            "progress": 80,
+            "message": "Generating embeddings..."
+        })
         print(f"\n🧠 Generating embeddings...")
         embeddings = await generate_embeddings(chunks)
         
         # Save lecture data with cloned voice ID
+        upload_progress[lecture_id].update({
+            "stage": "saving",
+            "progress": 95,
+            "message": "Finalizing..."
+        })
         lecture_data = {
             "id": lecture_id,
             "filename": file.filename,
@@ -162,6 +199,21 @@ async def upload_lecture(file: UploadFile = File(...)):
         
         save_lecture(lecture_id, lecture_data)
         
+        # Mark as completed
+        upload_progress[lecture_id].update({
+            "status": "completed",
+            "stage": "completed",
+            "progress": 100,
+            "message": "Lecture processed successfully!",
+            "result": {
+                "lecture_id": lecture_id,
+                "filename": file.filename,
+                "chunks_count": len(chunks),
+                "cloned_voice_id": cloned_voice_id,
+                "voice_cloning_quality": clip_quality["quality_score"]
+            }
+        })
+        
         print(f"\n✅ Lecture processed successfully with cloned voice!")
         
         return {
@@ -174,6 +226,12 @@ async def upload_lecture(file: UploadFile = File(...)):
         }
     
     except Exception as e:
+        # Mark as error
+        if lecture_id in upload_progress:
+            upload_progress[lecture_id].update({
+                "status": "error",
+                "message": str(e)
+            })
         raise HTTPException(status_code=500, detail=str(e))
 
 
