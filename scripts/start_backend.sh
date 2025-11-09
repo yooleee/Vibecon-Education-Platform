@@ -1,16 +1,20 @@
 #!/bin/bash
 # Backend startup wrapper - ensures ffmpeg is installed before starting
 
-echo "🚀 Starting EduVoice Backend..."
-
-# Check and install ffmpeg if needed
-/app/scripts/check_dependencies.sh
-
-# Exit if dependency check failed
-if [ $? -ne 0 ]; then
-    echo "❌ Dependency check failed - cannot start backend"
-    exit 1
+# Auto-install ffmpeg if missing (non-interactive)
+if ! command -v ffmpeg &> /dev/null; then
+    echo "⚠️  ffmpeg not found - installing automatically..."
+    sudo apt-get update -qq > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg > /dev/null 2>&1
+    
+    if command -v ffmpeg &> /dev/null; then
+        echo "✅ ffmpeg auto-installed successfully"
+    else
+        echo "❌ Failed to auto-install ffmpeg - manual installation required"
+    fi
 fi
+
+echo "🚀 Starting EduVoice Backend..."
 
 # Start the backend
 cd /app/backend
