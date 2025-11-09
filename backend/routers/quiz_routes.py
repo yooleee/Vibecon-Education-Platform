@@ -236,7 +236,7 @@ async def submit_answer(request: SubmitAnswerRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/session/{session_id}/answer-voice")
+@router.post("/session/answer-voice")
 async def submit_voice_answer(
     session_id: str = Form(...),
     question_id: str = Form(...),
