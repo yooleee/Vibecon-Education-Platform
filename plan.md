@@ -604,7 +604,7 @@ The migration successfully maintains full backward compatibility with V1 while p
 - ⏳ Implement Phase 3 enhancements iteratively
 - ⏳ Continuous monitoring and optimization
 
-**Preview URL:** https://smart-tutor-graph.preview.emergentagent.com ✅ Live and MVP Ready
+**Preview URL:** https://langmemory-talk.preview.emergentagent.com ✅ Live and MVP Ready
 
 ---
 
