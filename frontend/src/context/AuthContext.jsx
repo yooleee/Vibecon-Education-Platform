@@ -47,29 +47,29 @@ export const AuthProvider = ({ children, backendUrl }) => {
 
   // Load user on mount if token exists
   useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.error('Failed to load user:', error);
+        // Token is invalid, clear it
+        localStorage.removeItem('auth_token');
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (token) {
       loadUser();
     } else {
       setLoading(false);
     }
-  }, [token]);
-
-  const loadUser = async () => {
-    try {
-      const response = await axios.get(`${backendUrl}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error('Failed to load user:', error);
-      // Token is invalid, clear it
-      localStorage.removeItem('auth_token');
-      setToken(null);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [token, backendUrl]);
 
   const loginWithGoogle = async (googleToken) => {
     try {
