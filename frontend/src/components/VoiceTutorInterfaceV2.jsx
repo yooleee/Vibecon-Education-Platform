@@ -42,6 +42,14 @@ function VoiceTutorInterfaceV2({ lectureId, backendUrl }) {
     }
   }, [lectureId]);
 
+  // Reinitialize session when language changes
+  useEffect(() => {
+    if (sessionId) {
+      console.log('🌍 Language changed to:', selectedLanguage, '- Reinitializing session...');
+      initializeSession();
+    }
+  }, [selectedLanguage]);
+
   const initializeSession = async () => {
     try {
       console.log('🎯 Initializing V2 session...');
