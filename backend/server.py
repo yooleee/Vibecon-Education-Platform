@@ -182,6 +182,18 @@ async def speak(request: TTSRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/audio/{audio_id}")
+async def get_audio(audio_id: str):
+    """Serve TTS audio file"""
+    try:
+        audio_path = f"/app/data/uploads/tts_{audio_id}.mp3"
+        if not os.path.exists(audio_path):
+            raise HTTPException(status_code=404, detail="Audio file not found")
+        return FileResponse(audio_path, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
