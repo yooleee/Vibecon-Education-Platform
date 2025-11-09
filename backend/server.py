@@ -137,7 +137,7 @@ async def get_lecture(lecture_id: str):
 
 @app.post("/api/query")
 async def query_lecture(request: QueryRequest):
-    """Ask a question about a lecture"""
+    """Ask a question about a lecture - Voice-first interaction"""
     try:
         # Load lecture data
         lecture = load_lecture(request.lecture_id)
@@ -157,15 +157,62 @@ async def query_lecture(request: QueryRequest):
         # Generate answer using GPT-4o
         answer = await answer_query(request.question, relevant_chunks)
         
-        # If voice mode, convert to speech
-        audio_url = None
-        if request.mode == "voice":
-            audio_url = await text_to_speech(answer)
+        # VOICE-FIRST: Always generate audio response with Cartesia
+        from services.voice_service import text_to_speech_cartesia
+        audio_path = await text_to_speech_cartesia(answer)
+        audio_filename = os.path.basename(audio_path)
+        audio_url = f"/api/audio/{audio_filename}"
         
         return {
             "answer": answer,
             "relevant_chunks": relevant_chunks,
-            "audio_url": audio_url
+            "audio_url": audio_url,
+            "audio_path": audio_path
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/voice-query")
+async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)):
+    """Voice-first query - upload audio question, get audio answer"""
+    try:
+        # Save uploaded audio
+        audio_id = str(uuid.uuid4())
+        audio_path = os.path.join(UPLOAD_DIR, f"question_{audio_id}.wav")
+        
+        with open(audio_path, "wb") as f:
+            content = await audio.read()
+            f.write(content)
+        
+        # Transcribe question
+        question_text = await transcribe_audio(audio_path)
+        
+        # Load lecture
+        lecture = load_lecture(lecture_id)
+        if not lecture:
+            raise HTTPException(status_code=404, detail="Lecture not found")
+        
+        # Generate embedding and find relevant chunks
+        question_embedding = await generate_embeddings([question_text])
+        similarities = compute_similarity(question_embedding[0], lecture["embeddings"])
+        top_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)[:3]
+        relevant_chunks = [lecture["chunks"][i] for i in top_indices]
+        
+        # Generate answer
+        answer = await answer_query(question_text, relevant_chunks)
+        
+        # Generate voice response with Cartesia
+        from services.voice_service import text_to_speech_cartesia
+        audio_path = await text_to_speech_cartesia(answer)
+        audio_filename = os.path.basename(audio_path)
+        
+        return {
+            "question": question_text,
+            "answer": answer,
+            "audio_url": f"/api/audio/{audio_filename}",
+            "relevant_chunks": relevant_chunks
         }
     
     except Exception as e:
