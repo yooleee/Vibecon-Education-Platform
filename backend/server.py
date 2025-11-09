@@ -65,6 +65,33 @@ async def health_check():
     return {"status": "healthy", "service": "EduVoice API"}
 
 
+@app.get("/api/upload-progress/{lecture_id}")
+async def get_upload_progress(lecture_id: str):
+    """Get real-time progress for an upload"""
+    async def event_generator():
+        """Generate SSE events for progress updates"""
+        while True:
+            if lecture_id in upload_progress:
+                progress_data = upload_progress[lecture_id]
+                yield f"data: {json.dumps(progress_data)}\n\n"
+                
+                # If completed or errored, stop streaming
+                if progress_data.get("status") in ["completed", "error"]:
+                    break
+            
+            await asyncio.sleep(0.5)  # Poll every 500ms
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
+
 @app.post("/api/upload")
 async def upload_lecture(file: UploadFile = File(...)):
     """Upload and process a lecture video with voice cloning"""
