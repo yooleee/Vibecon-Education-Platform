@@ -50,6 +50,10 @@ os.makedirs(LECTURE_DIR, exist_ok=True)
 upload_progress = {}
 
 
+class GoogleAuthRequest(BaseModel):
+    token: str
+
+
 class QueryRequest(BaseModel):
     lecture_id: str
     question: str
