@@ -1,14 +1,14 @@
 [
   {
     "content": "Remove full transcript viewer from lecture viewer",
+    "status": "completed"
+  },
+  {
+    "content": "Document LiveKit agent requirements",
     "status": "in_progress"
   },
   {
-    "content": "Fix LiveKit connection and agent setup",
-    "status": "pending"
-  },
-  {
-    "content": "Test LiveKit real-time voice chat",
+    "content": "Verify frontend build and multilingual feature",
     "status": "pending"
   }
 ]
