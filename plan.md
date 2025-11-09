@@ -38,7 +38,7 @@
 5. ✅ As a developer, I can see logs confirming lecture_id metadata reached the agent.
 
 **Testing Instructions for User**:
-1. Sign in with Google at https://tutor-chat-ai.preview.emergentagent.com
+1. Sign in with Google at https://design-preview-34.preview.emergentagent.com
 2. Upload or select an existing lecture
 3. Click "Start Session" button on the lecture card
 4. Allow microphone permissions when prompted
