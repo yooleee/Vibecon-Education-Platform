@@ -29,31 +29,27 @@ async def text_to_speech_cartesia(text: str, voice_id: str = "a0e99841-438c-4a64
         audio_id = str(uuid.uuid4())
         output_path = f"/app/data/uploads/voice_{audio_id}.mp3"
         
-        # Generate speech with Cartesia
+        # Output format configuration
         output_format = {
             "container": "mp3",
             "encoding": "mp3",
             "sample_rate": 44100
         }
         
-        # Stream audio and save
-        async with cartesia_client.tts.sse(
+        # Generate speech with Cartesia using bytes method
+        audio_data = b""
+        async for chunk in cartesia_client.tts.bytes(
             model_id="sonic-english",
             transcript=text,
-            voice_id=voice_id,
+            voice={"id": voice_id},  # Pass as dictionary with 'id' key
             output_format=output_format,
             language="en"
-        ) as source:
-            audio_chunks = []
-            async for chunk in source:
-                audio_chunks.append(chunk["audio"])
-            
-            # Concatenate and save
-            if audio_chunks:
-                import base64
-                audio_data = b"".join([base64.b64decode(chunk) for chunk in audio_chunks])
-                with open(output_path, "wb") as f:
-                    f.write(audio_data)
+        ):
+            audio_data += chunk
+        
+        # Save the complete audio file
+        with open(output_path, "wb") as f:
+            f.write(audio_data)
         
         return output_path
     
