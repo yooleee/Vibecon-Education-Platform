@@ -160,7 +160,7 @@ async def entrypoint(ctx: JobContext):
     
     # Create voice pipeline agent
     agent = agents.VoicePipelineAgent(
-        vad=silero.VAD.load(),
+        vad=silero_vad.load(),
         stt=deepgram.STT(model="nova-2-general"),
         llm=openai.LLM(model="gpt-4"),
         tts=cartesia.TTS(voice="a0e99841-438c-4a64-b679-ae501e7d6091"),  # Default Cartesia voice
