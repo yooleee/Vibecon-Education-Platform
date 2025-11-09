@@ -207,7 +207,7 @@ async def query_lecture(request: QueryRequest):
 
 
 @app.post("/api/voice-query")
-async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)):
+async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...), language: str = Form("en")):
     """Voice-first query - upload audio question, get audio answer in professor's voice"""
     try:
         # Save uploaded audio
@@ -235,12 +235,12 @@ async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)
         # Generate answer
         answer = await answer_query(question_text, relevant_chunks)
         
-        # Generate voice response with CLONED PROFESSOR VOICE!
+        # Generate voice response with CLONED PROFESSOR VOICE in selected language!
         from services.voice_service import text_to_speech_cartesia
         voice_id = lecture.get("cloned_voice_id", "a0e99841-438c-4a64-b679-ae501e7d6091")
-        print(f"🎙️ Responding in professor's cloned voice: {voice_id}")
+        print(f"🎙️ Responding in professor's cloned voice: {voice_id} in language: {language}")
         
-        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id)
+        audio_path = await text_to_speech_cartesia(answer, voice_id=voice_id, language=language)
         audio_filename = os.path.basename(audio_path)
         
         return {
@@ -248,7 +248,8 @@ async def voice_query(lecture_id: str = Form(...), audio: UploadFile = File(...)
             "answer": answer,
             "audio_url": f"/api/audio/{audio_filename}",
             "relevant_chunks": relevant_chunks,
-            "using_cloned_voice": True
+            "using_cloned_voice": True,
+            "language": language
         }
     
     except Exception as e:
