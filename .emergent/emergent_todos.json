@@ -1,7 +1,7 @@
 [
   {
     "content": "Install LangGraph dependencies (langgraph, langchain, langchain-openai) and restart backend",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create MongoDB session and conversation models with UUID + UTC",
