@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -13,7 +13,9 @@ import {
   PlayArrow,
   Refresh,
   VideoLibrary,
+  Mic,
 } from '@mui/icons-material';
+import LiveKitSessionDialog from './LiveKitSessionDialog';
 
 function LectureList({ lectures, loading, onSelectLecture, onRefresh }) {
   const formatDate = (dateString) => {
