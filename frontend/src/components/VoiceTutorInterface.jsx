@@ -87,13 +87,23 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
 
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        console.log('Audio recorded:', audioBlob.size, 'bytes');
+        
+        // Check if audio is too short
+        if (audioBlob.size < 1000) {
+          setError('Recording too short. Please speak for at least 1 second.');
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+        
         await sendVoiceMessage(audioBlob);
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorderRef.current.start();
+      // Start recording with timeslice to collect data continuously
+      mediaRecorderRef.current.start(100); // Collect data every 100ms
       setRecording(true);
       setError(null);
     } catch (err) {
