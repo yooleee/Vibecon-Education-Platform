@@ -5,11 +5,11 @@
   },
   {
     "content": "Fix multilingual language parameter handling",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add LiveKit integration to frontend",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test multilingual feature with all languages",
