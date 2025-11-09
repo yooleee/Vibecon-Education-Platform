@@ -233,6 +233,60 @@ function VoiceTutorInterface({ lectureId, backendUrl }) {
             </Alert>
           )}
 
+          {/* Language Selector */}
+          <Box sx={{ 
+            mb: 3, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: 2,
+            bgcolor: 'background.paper',
+            p: 2,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <Language color="primary" />
+            <Typography variant="body1" fontWeight="bold">
+              Response Language:
+            </Typography>
+            <ToggleButtonGroup
+              value={selectedLanguage}
+              exclusive
+              onChange={(e, newLang) => {
+                if (newLang !== null) {
+                  setSelectedLanguage(newLang);
+                }
+              }}
+              size="small"
+              data-testid="language-selector"
+            >
+              {languages.map((lang) => (
+                <ToggleButton 
+                  key={lang.code} 
+                  value={lang.code}
+                  data-testid={`language-${lang.code}`}
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    '&.Mui-selected': {
+                      bgcolor: 'primary.main',
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'primary.dark',
+                      }
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <span style={{ fontSize: '1.2rem' }}>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </Box>
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </Box>
+
           {/* Voice Control Center */}
           <Box sx={{ 
             textAlign: 'center', 
