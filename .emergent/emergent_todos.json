@@ -9,11 +9,11 @@
   },
   {
     "content": "Create backend endpoint POST /api/livekit/session/start for token generation",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create LiveKit agent worker script (lecture_agent.py) with GPT-4 + Cartesia TTS",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Install livekit-client in frontend (yarn add livekit-client)",
